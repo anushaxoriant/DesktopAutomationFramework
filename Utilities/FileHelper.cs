@@ -4,163 +4,131 @@ namespace DesktopAutomationFramework.Utilities
 {
     public static class FileHelper
     {
-        //---------------------------------
-        // Test Folder
-        //---------------------------------
+        // Test folder
 
         private static readonly string TestFolder =
             @"C:\Temp\TestFiles";
 
-        //---------------------------------
-// Prepare Files
-//---------------------------------
+        // Prepare files
 
-public static void PrepareTestFiles()
-{
-    try
-    {
-        //---------------------------------
-        // Create Folder
-        //---------------------------------
+        public static void PrepareTestFiles()
+        {
+            try
+            {
+                // Create folder
 
-        Directory.CreateDirectory(
-            TestFolder);
+                Directory.CreateDirectory(
+                    TestFolder);
 
-        //---------------------------------
-        // TC_002_01
-        // Append FlaUI
-        //---------------------------------
+                // TC_002_01
+                // Append flaUI
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "AppendText_FlaUI.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "AppendText_FlaUI.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_002_02
-        // Append Automation
-        //---------------------------------
+                // TC_002_02
+                // Append automation
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "AppendText_Automation.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "AppendText_Automation.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_003
-        // Clear Text
-        //---------------------------------
+                // TC_003
+                // Clear text
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "ClearText.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "ClearText.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_004_01
-        // Find Hello
-        //---------------------------------
+                // TC_004_01
+                // Find hello
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Find_Hello.txt"),
-            "Hello World FlaUI");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Find_Hello.txt"),
+                    "Hello World FlaUI");
 
-        //---------------------------------
-        // TC_004_02
-        // Find World
-        //---------------------------------
+                // TC_004_02
+                // Find world
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Find_World.txt"),
-            "Hello World FlaUI");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Find_World.txt"),
+                    "Hello World FlaUI");
 
-        //---------------------------------
-        // TC_004_03
-        // Find FlaUI
-        //---------------------------------
+                // TC_004_03
+                // Find flaUI
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Find_FlaUI.txt"),
-            "Hello World FlaUI");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Find_FlaUI.txt"),
+                    "Hello World FlaUI");
 
-        //---------------------------------
-        // TC_005_01
-        // Replace World
-        //---------------------------------
+                // TC_005_01
+                // Replace world
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Replace_World.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Replace_World.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_005_02
-        // Replace Hello
-        //---------------------------------
+                // TC_005_02
+                // Replace hello
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Replace_Hello.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Replace_Hello.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_006_01
-        // Undo FlaUI
-        //---------------------------------
+                // TC_006_01
+                // Undo flaUI
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Undo_FlaUI.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Undo_FlaUI.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // TC_006_02
-        // Undo Framework
-        //---------------------------------
+                // TC_006_02
+                // Undo framework
 
-        File.WriteAllText(
-            Path.Combine(
-                TestFolder,
-                "Undo_Framework.txt"),
-            "Hello World");
+                File.WriteAllText(
+                    Path.Combine(
+                        TestFolder,
+                        "Undo_Framework.txt"),
+                    "Hello World");
 
-        //---------------------------------
-        // Logging
-        //---------------------------------
+                // Logging
 
-        LoggerHelper.Log(
-            "Baseline test files prepared");
-    }
-    catch (Exception ex)
-    {
-        LoggerHelper.Log(
-            $"PrepareTestFiles failed: {ex.Message}");
+                LoggerHelper.Log(
+                    "Baseline test files prepared");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Log(
+                    $"PrepareTestFiles failed: {ex.Message}");
 
-        throw;
-    }
-}
+                throw;
+            }
+        }
 
-        //---------------------------------
-        // Cleanup Files
-        //---------------------------------
+        // Cleanup files
 
         public static void CleanupTestFiles()
         {
-            //---------------------------------
-            // Delete Folder
-            //---------------------------------
+            // Delete folder
 
             if (Directory.Exists(
                 TestFolder))
@@ -170,9 +138,7 @@ public static void PrepareTestFiles()
                     true);
             }
 
-            //---------------------------------
-            // Delete Save File
-            //---------------------------------
+            // Delete save file
 
             string saveFile =
                 @"C:\Temp\SaveFile.txt";

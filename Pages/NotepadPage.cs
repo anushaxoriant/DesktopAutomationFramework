@@ -1,16 +1,16 @@
-using System.Linq;
 using DesktopAutomationFramework.Utilities;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
-using NUnit.Framework;
 
 namespace DesktopAutomationFramework.Pages
 {
     public class NotepadPage
     {
+        // Window
+
         private readonly Window _window;
 
         // Constructor
@@ -45,81 +45,23 @@ namespace DesktopAutomationFramework.Pages
                 "Notepad page initialized");
         }
 
-        //---------------------------------
-// Public Window
-//---------------------------------
+        // Public window
 
-public Window Window =>
-    _window;
-
-        private void ClickElement(
-    AutomationElement? element)
-{
-    if (element == null)
-    {
-        throw new Exception(
-            "Element is null");
-    }
-
-    //---------------------------------
-    // Wait For Element
-    //---------------------------------
-
-    WaitHelper.WaitForElement(
-        element);
-
-    //---------------------------------
-    // Get Click Point
-    //---------------------------------
-
-    var point =
-        element.GetClickablePoint();
-
-    //---------------------------------
-    // Move Mouse
-    //---------------------------------
-
-    Mouse.MoveTo(
-        point);
-
-    ApplyDemoDelay();
-
-    //---------------------------------
-    // Click
-    //---------------------------------
-
-    Mouse.Click(
-        point);
-
-    ApplyDemoDelay();
-}
-
-        // Initialize window
-
-        public void InitializeWindow()
-        {
-            LoggerHelper.Log(
-                "Maximizing window");
-
-            _window.Focus();
-
-            _window.Patterns
-                .Window.Pattern
-                .SetWindowVisualState(
-                    WindowVisualState.Maximized);
-
-            ApplyDemoDelay();
-
-            LoggerHelper.Log(
-                "Window maximized");
-        }
+        public Window Window =>
+            _window;
 
         // Editor
 
         public FlaUI.Core.AutomationElements.TextBox Editor =>
-            _window.FindFirstDescendant(cf =>
-                cf.ByControlType(
-                    ControlType.Document))
+            _window.FindFirstDescendant(
+                cf => cf.ByAutomationId(
+                    "15"))
+
+            ?.AsTextBox()
+
+            ?? _window.FindFirstDescendant(
+                cf => cf.ByName(
+                    "Text Editor"))
 
             ?.AsTextBox()
 
@@ -134,95 +76,127 @@ public Window Window =>
                 .Wait();
         }
 
+        // Initialize window
+
+        public void InitializeWindow()
+        {
+            LoggerHelper.Log(
+                "Maximizing window");
+
+            _window.Focus();
+
+            _window.Patterns
+                .Window.Pattern
+                .SetWindowVisualState(
+                    FlaUI.Core.Definitions.WindowVisualState.Maximized);
+
+            ApplyDemoDelay();
+
+            LoggerHelper.Log(
+                "Window maximized");
+        }
+
         // Click element
 
+        private void ClickElement(
+            AutomationElement? element)
+        {
+            if (element == null)
+            {
+                throw new Exception(
+                    "Element is null");
+            }
+
+            WaitHelper.WaitForElement(
+                element);
+
+            // Invoke preferred
+
+            if (element.Patterns.Invoke.IsSupported)
+            {
+                element.Patterns
+                    .Invoke.Pattern
+                    .Invoke();
+            }
+            else
+            {
+                // Mouse fallback
+
+                var point =
+                    element.GetClickablePoint();
+
+                Mouse.MoveTo(
+                    point);
+
+                ApplyDemoDelay();
+
+                Mouse.Click(
+                    point);
+            }
+
+            ApplyDemoDelay();
+        }
+
+        // Click menu
+
         private void ClickMenu(
-    string parentMenu,
-    string childMenu)
-{
-    LoggerHelper.Log(
-        $"Opening menu: {parentMenu}");
+            string parentMenu,
+            string childMenu)
+        {
+            LoggerHelper.Log(
+                $"Opening menu: {parentMenu}");
 
-    //---------------------------------
-    // Parent Menu
-    //---------------------------------
+            // Parent menu
 
-    var parent =
-        _window.FindFirstDescendant(cf =>
-            cf.ByName(parentMenu))
+            var parent =
+                _window.FindFirstDescendant(
+                    cf => cf.ByName(
+                        parentMenu))
 
-        ?.AsMenuItem()
+                ?.AsMenuItem()
 
-        ?? throw new Exception(
-            $"Parent menu not found: {parentMenu}");
+                ?? throw new Exception(
+                    $"Parent menu not found: {parentMenu}");
 
-    //---------------------------------
-    // Parent Click Point
-    //---------------------------------
+            ClickElement(
+                parent);
 
-    var parentPoint =
-        parent.GetClickablePoint();
+            // Desktop
 
-    //---------------------------------
-    // Click Parent Menu
-    //---------------------------------
+            var desktop =
+                _window.Automation
+                .GetDesktop();
 
-    Mouse.MoveTo(
-        parentPoint);
+            // Wait child menu
 
-    ApplyDemoDelay();
+            WaitHelper.WaitUntil(
+                () =>
+                    desktop.FindFirstDescendant(
+                        cf => cf.ByName(
+                            childMenu)) != null,
+                10,
+                $"Child menu not found: {childMenu}");
 
-    Mouse.Click(
-        parentPoint);
+            // Child menu
 
-    ApplyDemoDelay();
+            var child =
+                desktop.FindFirstDescendant(
+                    cf => cf.ByName(
+                        childMenu))
 
-    LoggerHelper.Log(
-        $"{parentMenu} menu clicked");
+                ?.AsMenuItem()
 
-    //---------------------------------
-    // Desktop
-    //---------------------------------
+                ?? throw new Exception(
+                    $"Child menu not found: {childMenu}");
 
-    var desktop =
-        _window.Automation
-        .GetDesktop();
+            ClickElement(
+                child);
 
-    //---------------------------------
-    // Wait For Child Menu
-    //---------------------------------
+            ApplyDemoDelay();
 
-    WaitHelper.WaitUntil(
-        () =>
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName(childMenu)) != null,
-        10,
-        $"Child menu not found: {childMenu}");
-
-    //---------------------------------
-    // Child Menu
-    //---------------------------------
-
-    var child =
-        desktop.FindFirstDescendant(cf =>
-            cf.ByName(childMenu))
-
-        ?.AsMenuItem()
-
-        ?? throw new Exception(
-            $"Child menu not found: {childMenu}");
-
-    //---------------------------------
-    // Invoke Child Menu
-    //---------------------------------
-
-    child.Invoke();
-
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        $"Clicked menu: {parentMenu} -> {childMenu}");
-}
+            LoggerHelper.Log(
+                $"Clicked menu: {parentMenu} -> {childMenu}");
+        }
 
         // Enter text
 
@@ -234,126 +208,41 @@ public Window Window =>
 
             Editor.Focus();
 
-            foreach (char character in text)
-            {
-                Keyboard.Type(
-                    character);
+            Editor.Enter(
+                text);
 
-                ApplyDemoDelay();
-            }
+            ApplyDemoDelay();
 
             LoggerHelper.Log(
                 "Text entered");
         }
 
-        private Window GetFindWindow()
-{
-    //---------------------------------
-    // Desktop
-    //---------------------------------
-
-    var desktop =
-        _window.Automation
-        .GetDesktop();
-
-    //---------------------------------
-    // Wait For Find Window
-    //---------------------------------
-
-    WaitHelper.WaitUntil(
-        () =>
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName("Find")) != null,
-        10,
-        "Find window not found");
-
-    //---------------------------------
-    // Find Window
-    //---------------------------------
-
-    return desktop.FindFirstDescendant(cf =>
-            cf.ByName("Find"))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            "Find window not found");
-}
-
-private Window GetReplaceWindow()
-{
-    //---------------------------------
-    // Desktop
-    //---------------------------------
-
-    var desktop =
-        _window.Automation
-        .GetDesktop();
-
-    //---------------------------------
-    // Wait For Replace Window
-    //---------------------------------
-
-    WaitHelper.WaitUntil(
-        () =>
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName("Replace")) != null,
-        10,
-        "Replace window not found");
-
-    //---------------------------------
-    // Replace Window
-    //---------------------------------
-
-    return desktop.FindFirstDescendant(cf =>
-            cf.ByName("Replace"))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            "Replace window not found");
-}
-
         // Append text
 
         public void AppendText(
-    string text)
-{
-    LoggerHelper.Log(
-        $"Appending text: {text}");
+            string text)
+        {
+            LoggerHelper.Log(
+                $"Appending text: {text}");
 
-    //---------------------------------
-    // Focus Editor
-    //---------------------------------
+            Editor.Focus();
 
-    Editor.Focus();
+            Keyboard.Press(
+                VirtualKeyShort.END);
 
-    ApplyDemoDelay();
+            Keyboard.Release(
+                VirtualKeyShort.END);
 
-    //---------------------------------
-    // Move Cursor To End
-    //---------------------------------
+            ApplyDemoDelay();
 
-    Mouse.Click(
-        Editor.GetClickablePoint());
+            Keyboard.Type(
+                text);
 
-    ApplyDemoDelay();
+            ApplyDemoDelay();
 
-    //---------------------------------
-    // Type Text Normally
-    //---------------------------------
-
-    foreach (char character in text)
-    {
-        Keyboard.Type(
-            character);
-
-        ApplyDemoDelay();
-    }
-
-    LoggerHelper.Log(
-        "Text appended");
-}
+            LoggerHelper.Log(
+                "Text appended");
+        }
 
         // Save file
 
@@ -363,107 +252,75 @@ private Window GetReplaceWindow()
             LoggerHelper.Log(
                 $"Saving file: {filePath}");
 
-            //---------------------------------
             // File -> Save
-            //---------------------------------
 
             ClickMenu(
                 "File",
                 "Save");
 
-            //---------------------------------
-            // Wait For Save Dialog
-            //---------------------------------
+            // Wait dialog
 
             WaitHelper.WaitUntil(
-                () => _window.ModalWindows.Length > 0,
+                () =>
+                    _window.ModalWindows.Length > 0,
                 10,
                 "Save dialog not found");
 
-            //---------------------------------
-            // Save Window
-            //---------------------------------
+            // Save window
 
             var saveWindow =
                 _window.ModalWindows[0];
 
-            LoggerHelper.Log(
-                "Save dialog opened");
+            // File name textbox
+
+            var fileNameBox =
+                saveWindow.FindFirstDescendant(
+                    cf => cf.ByAutomationId(
+                        "1001"))
+
+                ?.AsTextBox()
+
+                ?? saveWindow.FindFirstDescendant(
+                    cf => cf.ByName(
+                        "File name:"))
+
+                ?.AsTextBox()
+
+                ?? throw new Exception(
+                    "File name textbox not found");
+
+            // Enter path
+
+            fileNameBox.Focus();
 
             ApplyDemoDelay();
 
-            //---------------------------------
-            // File Name TextBox
-            //---------------------------------
+            fileNameBox.Text =
+                string.Empty;
 
-           //---------------------------------
-// File Name TextBox
-//---------------------------------
+            ApplyDemoDelay();
 
-var fileNameBox =
-    saveWindow.FindFirstDescendant(cf =>
-        cf.ByAutomationId(
-            "1001"))
+            fileNameBox.Enter(
+                filePath);
 
-    ?.AsTextBox()
+            ApplyDemoDelay();
 
-    ?? throw new Exception(
-        "File name textbox not found");
-
-LoggerHelper.Log(
-    "File name textbox located");
-
-ApplyDemoDelay();
-
-//---------------------------------
-// Enter File Path
-//---------------------------------
-
-fileNameBox.Focus();
-
-ApplyDemoDelay();
-
-fileNameBox.Text =
-    string.Empty;
-
-ApplyDemoDelay();
-
-fileNameBox.Enter(
-    filePath);
-
-ApplyDemoDelay();
-
-LoggerHelper.Log(
-    $"Entered file path: {filePath}");
-
-            LoggerHelper.Log(
-                $"Entered path: {filePath}");
-
-            //---------------------------------
-            // Save Button
-            //---------------------------------
+            // Save button
 
             var saveButton =
-                saveWindow.FindFirstDescendant(cf =>
-                    cf.ByName("Save"))
+                saveWindow.FindFirstDescendant(
+                    cf => cf.ByName(
+                        "Save"))
 
                 ?.AsButton()
 
                 ?? throw new Exception(
                     "Save button not found");
 
-            //---------------------------------
-            // Click Save
-            //---------------------------------
+            ClickElement(
+                saveButton);
 
-            saveButton.Invoke();
-
-            LoggerHelper.Log(
-                "Clicked Save button");
-
-            //---------------------------------
-            // Validate Save
-            //---------------------------------
+            // Validate save
 
             WaitHelper.WaitUntil(
                 () => File.Exists(
@@ -516,9 +373,11 @@ LoggerHelper.Log(
             LoggerHelper.Log(
                 "Deleting selected text");
 
-            ClickMenu(
-                "Edit",
-                "Delete");
+            Keyboard.Press(
+                VirtualKeyShort.DELETE);
+
+            Keyboard.Release(
+                VirtualKeyShort.DELETE);
 
             ApplyDemoDelay();
 
@@ -529,603 +388,341 @@ LoggerHelper.Log(
         // Perform undo
 
         public void PerformUndo()
-{
-    LoggerHelper.Log(
-        "Performing Undo");
+        {
+            LoggerHelper.Log(
+                "Performing Undo");
 
-    ClickMenu(
-        "Edit",
-        "Undo");
+            ClickMenu(
+                "Edit",
+                "Undo");
 
-    ApplyDemoDelay();
+            ApplyDemoDelay();
 
-    LoggerHelper.Log(
-        "Undo completed");
-}
-
+            LoggerHelper.Log(
+                "Undo completed");
+        }
 
         // Open find dialog
-public Window OpenFindDialog()
-{
-    LoggerHelper.Log(
-        "Opening Find dialog");
 
-    //---------------------------------
-    // Open Menu
-    //---------------------------------
+        public Window OpenFindDialog()
+        {
+            LoggerHelper.Log(
+                "Opening Find dialog");
 
-    ClickMenu(
-        "Edit",
-        "Find...");
+            ClickMenu(
+                "Edit",
+                "Find...");
 
-    //---------------------------------
-    // Stabilization Delay
-    //---------------------------------
+            var findWindow =
+                GetDialogWindow(
+                    "Find");
 
-    Task.Delay(2000)
-        .Wait();
+            LoggerHelper.Log(
+                "Find dialog opened");
 
-    //---------------------------------
-    // Desktop
-    //---------------------------------
-
-    var desktop =
-        _window.Automation
-        .GetDesktop();
-
-    //---------------------------------
-    // Find Window
-    //---------------------------------
-
-    var findWindow =
-        desktop.FindFirstDescendant(cf =>
-            cf.ByName("Find"))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            "Find dialog not found");
-
-    //---------------------------------
-    // Focus Window
-    //---------------------------------
-
-    findWindow.Focus();
-
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        "Find dialog opened");
-
-    return findWindow;
-}
+            return findWindow;
+        }
 
         // Validate find dialog defaults
 
         public void ValidateFindDialogDefaults()
-{
-    var findWindow =
-        GetDialogWindow(
-            "Find");
+        {
+            var findWindow =
+                GetDialogWindow(
+                    "Find");
 
-    Assert.That(
-        findWindow,
-        Is.Not.Null);
-}
+            if (findWindow == null)
+            {
+                throw new Exception(
+                    "Find dialog validation failed");
+            }
+        }
 
         // Perform find
 
         public void PerformFind(
-    Window findWindow,
-    string textToFind)
-{
-    LoggerHelper.Log(
-        $"Finding text: {textToFind}");
+            Window findWindow,
+            string textToFind)
+        {
+            LoggerHelper.Log(
+                $"Finding text: {textToFind}");
 
-    //---------------------------------
-    // Edit Controls
-    //---------------------------------
+            // Find textbox
 
-    var editControls =
-        findWindow.FindAllChildren(cf =>
-            cf.ByControlType(
-                ControlType.Edit));
+            var findTextBox =
+                findWindow.FindFirstDescendant(
+                    cf => cf.ByAutomationId(
+                        "1152"))
 
-    if (editControls.Length == 0)
-    {
-        throw new Exception(
-            "Find textbox not found");
-    }
+                ?.AsTextBox()
 
-    //---------------------------------
-    // Find TextBox
-    //---------------------------------
+                ?? throw new Exception(
+                    "Find textbox not found");
 
-    var findTextBox =
-        editControls[0]
-        .AsTextBox();
+            // Enter text
 
-    //---------------------------------
-    // Click TextBox
-    //---------------------------------
+            findTextBox.Enter(
+                textToFind);
 
-    ClickElement(
-        findTextBox);
+            ApplyDemoDelay();
 
-    //---------------------------------
-    // Type Text
-    //---------------------------------
+            // Find next button
 
-    foreach (char character in textToFind)
-    {
-        Keyboard.Type(
-            character);
+            var findNextButton =
+                findWindow.FindFirstDescendant(
+                    cf => cf.ByName(
+                        "Find Next"))
 
-        ApplyDemoDelay();
-    }
+                ?.AsButton()
 
-    //---------------------------------
-    // Buttons
-    //---------------------------------
+                ?? throw new Exception(
+                    "Find Next button not found");
 
-    var buttons =
-        findWindow.FindAllChildren(cf =>
-            cf.ByControlType(
-                ControlType.Button));
+            ClickElement(
+                findNextButton);
 
-    //---------------------------------
-    // Find Next Button
-    //---------------------------------
+            ApplyDemoDelay();
 
-    var findNextButton =
-        buttons
-        .FirstOrDefault(x =>
-            x.Name == "Find Next")
-
-        ?.AsButton()
-
-        ?? throw new Exception(
-            "Find Next button not found");
-
-    //---------------------------------
-    // Click Button
-    //---------------------------------
-
-    ClickElement(
-        findNextButton);
-
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        "Find completed");
-}
+            LoggerHelper.Log(
+                "Find completed");
+        }
 
         // Close find dialog
 
         public void CloseFindDialog(
-    Window findWindow)
-{
-    LoggerHelper.Log(
-        "Closing Find dialog");
+            Window findWindow)
+        {
+            LoggerHelper.Log(
+                "Closing Find dialog");
 
-    //---------------------------------
-    // Close Window
-    //---------------------------------
+            findWindow.Close();
 
-    findWindow.Close();
+            ApplyDemoDelay();
 
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        "Find dialog closed");
-}
+            LoggerHelper.Log(
+                "Find dialog closed");
+        }
 
         // Open replace dialog
 
         public Window OpenReplaceDialog()
-{
-    LoggerHelper.Log(
-        "Opening Replace dialog");
+        {
+            LoggerHelper.Log(
+                "Opening Replace dialog");
 
-    ClickMenu(
-        "Edit",
-        "Replace...");
+            ClickMenu(
+                "Edit",
+                "Replace...");
 
-    Task.Delay(2000)
-        .Wait();
+            var replaceWindow =
+                GetDialogWindow(
+                    "Replace");
 
-    var desktop =
-        _window.Automation
-        .GetDesktop();
+            LoggerHelper.Log(
+                "Replace dialog opened");
 
-    var replaceWindow =
-        desktop.FindFirstDescendant(cf =>
-            cf.ByName("Replace"))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            "Replace dialog not found");
-
-    replaceWindow.Focus();
-
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        "Replace dialog opened");
-
-    return replaceWindow;
-}
+            return replaceWindow;
+        }
 
         // Validate replace dialog defaults
 
         public void ValidateReplaceDialogDefaults()
-{
-    var replaceWindow =
-        GetDialogWindow(
-            "Replace");
-
-    Assert.That(
-        replaceWindow,
-        Is.Not.Null);
-}
-
-private Window GetDialogWindow(
-    string dialogName)
-{
-    //---------------------------------
-    // Desktop
-    //---------------------------------
-
-    var desktop =
-        _window.Automation
-        .GetDesktop();
-
-    //---------------------------------
-    // Wait For Dialog
-    //---------------------------------
-
-    WaitHelper.WaitUntil(
-        () =>
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName(dialogName)) != null,
-        10,
-        $"{dialogName} dialog not found");
-
-    //---------------------------------
-    // Delay
-    //---------------------------------
-
-    Task.Delay(2000)
-        .Wait();
-
-    //---------------------------------
-    // Window
-    //---------------------------------
-
-    return desktop.FindFirstDescendant(cf =>
-            cf.ByName(dialogName))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            $"{dialogName} dialog not found");
-}
-
-private void HandleCannotFindPopup()
-{
-    try
-    {
-        //---------------------------------
-        // Desktop
-        //---------------------------------
-
-        var desktop =
-            _window.Automation
-            .GetDesktop();
-
-        //---------------------------------
-        // Wait Briefly
-        //---------------------------------
-
-        Task.Delay(1000)
-            .Wait();
-
-        //---------------------------------
-        // Popup Window
-        //---------------------------------
-
-        var popup =
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName(
-                    "Notepad"))
-
-            ?.AsWindow();
-
-        if (popup == null)
         {
-            return;
+            var replaceWindow =
+                GetDialogWindow(
+                    "Replace");
+
+            if (replaceWindow == null)
+            {
+                throw new Exception(
+                    "Replace dialog validation failed");
+            }
         }
-
-        //---------------------------------
-        // OK Button
-        //---------------------------------
-
-        var okButton =
-            popup.FindFirstDescendant(cf =>
-                cf.ByName("OK"))
-
-            ?.AsButton();
-
-        if (okButton == null)
-        {
-            return;
-        }
-
-        //---------------------------------
-        // Click OK
-        //---------------------------------
-
-        LoggerHelper.Log(
-            "Closing Cannot Find popup");
-
-        ClickElement(
-            okButton);
-
-        ApplyDemoDelay();
-
-        LoggerHelper.Log(
-            "Cannot Find popup closed");
-    }
-    catch
-    {
-        //---------------------------------
-        // Ignore If Popup Missing
-        //---------------------------------
-    }
-}
 
         // Perform replace
 
         public void PerformReplace(
-    Window replaceWindow,
-    string findText,
-    string replaceText)
-{
-    LoggerHelper.Log(
-        $"Replacing {findText} with {replaceText}");
+            Window replaceWindow,
+            string findText,
+            string replaceText)
+        {
+            LoggerHelper.Log(
+                $"Replacing {findText} with {replaceText}");
 
-    //---------------------------------
-    // Edit Controls
-    //---------------------------------
+            // Find textbox
 
-    var editControls =
-        replaceWindow.FindAllChildren(cf =>
-            cf.ByControlType(
-                ControlType.Edit));
+            var findTextBox =
+                replaceWindow.FindFirstDescendant(
+                    cf => cf.ByAutomationId(
+                        "1152"))
 
-    if (editControls.Length < 2)
-    {
-        throw new Exception(
-            "Replace textboxes not found");
-    }
+                ?.AsTextBox()
 
-    //---------------------------------
-    // Find TextBox
-    //---------------------------------
+                ?? throw new Exception(
+                    "Find textbox not found");
 
-    var findTextBox =
-        editControls[0]
-        .AsTextBox();
+            // Replace textbox
 
-    //---------------------------------
-    // Replace TextBox
-    //---------------------------------
+            var replaceTextBox =
+                replaceWindow.FindFirstDescendant(
+                    cf => cf.ByAutomationId(
+                        "1153"))
 
-    var replaceTextBox =
-        editControls[1]
-        .AsTextBox();
+                ?.AsTextBox()
 
-    //---------------------------------
-    // Enter Find Text
-    //---------------------------------
+                ?? throw new Exception(
+                    "Replace textbox not found");
 
-    ClickElement(
-        findTextBox);
+            // Enter find text
 
-    foreach (char character in findText)
-    {
-        Keyboard.Type(
-            character);
+            findTextBox.Enter(
+                findText);
 
-        ApplyDemoDelay();
-    }
+            ApplyDemoDelay();
 
-    //---------------------------------
-    // Enter Replace Text
-    //---------------------------------
+            // Enter replace text
 
-    ClickElement(
-        replaceTextBox);
+            replaceTextBox.Enter(
+                replaceText);
 
-    foreach (char character in replaceText)
-    {
-        Keyboard.Type(
-            character);
+            ApplyDemoDelay();
 
-        ApplyDemoDelay();
-    }
+            // Find next button
 
-    //---------------------------------
-// Stabilize Focus
-//---------------------------------
+            var findNextButton =
+                replaceWindow.FindFirstDescendant(
+                    cf => cf.ByName(
+                        "Find Next"))
 
-ClickElement(
-    replaceTextBox);
+                ?.AsButton()
 
-ApplyDemoDelay();
+                ?? throw new Exception(
+                    "Find Next button not found");
 
-    //---------------------------------
-    // Buttons
-    //---------------------------------
+            ClickElement(
+                findNextButton);
 
-    //---------------------------------
-// Stabilization Delay
-//---------------------------------
+            ApplyDemoDelay();
 
-Task.Delay(1000)
-    .Wait();
+            // Replace button
 
-//---------------------------------
-// Find Next Button
-//---------------------------------
+            var replaceButton =
+                replaceWindow.FindFirstDescendant(
+                    cf => cf.ByName(
+                        "Replace"))
 
-var findNextButton =
-    replaceWindow.FindFirstChild(cf =>
-        cf.ByName("Find Next"))
+                ?.AsButton()
 
-    ?.AsButton()
+                ?? throw new Exception(
+                    "Replace button not found");
 
-    ?? throw new Exception(
-        "Find Next button not found");
+            ClickElement(
+                replaceButton);
 
-LoggerHelper.Log(
-    "Find Next button located");
+            ApplyDemoDelay();
 
-//---------------------------------
-// Click Find Next
-//---------------------------------
+            HandleCannotFindPopup();
 
-ClickElement(
-    findNextButton);
+            LoggerHelper.Log(
+                "Replace completed");
+        }
 
-ApplyDemoDelay();
-
-LoggerHelper.Log(
-    "Find Next clicked");
-
-//---------------------------------
-// Stabilization Delay
-//---------------------------------
-
-Task.Delay(1500)
-    .Wait();
-
-//---------------------------------
-// Replace Button
-//---------------------------------
-
-var replaceButton =
-    replaceWindow.FindFirstChild(cf =>
-        cf.ByName("Replace"))
-
-    ?.AsButton()
-
-    ?? throw new Exception(
-        "Replace button not found");
-
-LoggerHelper.Log(
-    "Replace button located");
-
-//---------------------------------
-// Wait For Enable
-//---------------------------------
-
-WaitHelper.WaitUntil(
-    () => replaceButton.IsEnabled,
-    10,
-    "Replace button not enabled");
-
-//---------------------------------
-// Click Replace
-//---------------------------------
-
-ClickElement(
-    replaceButton);
-
-ApplyDemoDelay();
-
-LoggerHelper.Log(
-    "Replace button clicked");
-
-HandleCannotFindPopup();
-
-    ApplyDemoDelay();
-
-    LoggerHelper.Log(
-        "Replace completed");
-}
-
-private Window WaitForDialog(
-    string dialogName)
-{
-    //---------------------------------
-    // Desktop
-    //---------------------------------
-
-    var desktop =
-        _window.Automation
-        .GetDesktop();
-
-    //---------------------------------
-    // Wait For Dialog
-    //---------------------------------
-
-    WaitHelper.WaitUntil(
-        () =>
-            desktop.FindFirstDescendant(cf =>
-                cf.ByName(dialogName)) != null,
-        10,
-        $"{dialogName} dialog not found");
-
-    //---------------------------------
-    // Stabilization Delay
-    //---------------------------------
-
-    Task.Delay(2000)
-        .Wait();
-
-    //---------------------------------
-    // Dialog Window
-    //---------------------------------
-
-    var dialog =
-        desktop.FindFirstDescendant(cf =>
-            cf.ByName(dialogName))
-
-        ?.AsWindow()
-
-        ?? throw new Exception(
-            $"{dialogName} dialog not found");
-
-    //---------------------------------
-    // Focus Dialog
-    //---------------------------------
-
-    dialog.Focus();
-
-    ApplyDemoDelay();
-
-    return dialog;
-}
         // Close replace dialog
 
         public void CloseReplaceDialog(
-    Window replaceWindow)
-{
-    LoggerHelper.Log(
-        "Closing Replace dialog");
+            Window replaceWindow)
+        {
+            LoggerHelper.Log(
+                "Closing Replace dialog");
 
-    //---------------------------------
-    // Close Window
-    //---------------------------------
+            replaceWindow.Close();
 
-    replaceWindow.Close();
+            ApplyDemoDelay();
 
-    ApplyDemoDelay();
+            LoggerHelper.Log(
+                "Replace dialog closed");
+        }
 
-    LoggerHelper.Log(
-        "Replace dialog closed");
-}
+        // Get dialog window
+
+        private Window GetDialogWindow(
+            string dialogName)
+        {
+            var desktop =
+                _window.Automation
+                .GetDesktop();
+
+            WaitHelper.WaitUntil(
+                () =>
+                    desktop.FindFirstDescendant(
+                        cf => cf.ByName(
+                            dialogName)) != null,
+                10,
+                $"{dialogName} dialog not found");
+
+            var dialog =
+                desktop.FindFirstDescendant(
+                    cf => cf.ByName(
+                        dialogName))
+
+                ?.AsWindow()
+
+                ?? throw new Exception(
+                    $"{dialogName} dialog not found");
+
+            dialog.Focus();
+
+            ApplyDemoDelay();
+
+            return dialog;
+        }
+
+        // Handle cannot find popup
+
+        private void HandleCannotFindPopup()
+        {
+            try
+            {
+                var desktop =
+                    _window.Automation
+                    .GetDesktop();
+
+                var popup =
+                    desktop.FindFirstDescendant(
+                        cf => cf.ByName(
+                            "Notepad"))
+
+                    ?.AsWindow();
+
+                if (popup == null)
+                {
+                    return;
+                }
+
+                var okButton =
+                    popup.FindFirstDescendant(
+                        cf => cf.ByName(
+                            "OK"))
+
+                    ?.AsButton();
+
+                if (okButton == null)
+                {
+                    return;
+                }
+
+                ClickElement(
+                    okButton);
+
+                ApplyDemoDelay();
+
+                LoggerHelper.Log(
+                    "Cannot Find popup closed");
+            }
+            catch
+            {
+                // Ignore popup failures
+            }
+        }
     }
 }

@@ -1,7 +1,3 @@
-//=========================================
-// NotepadDialogValidationTests.cs
-//=========================================
-
 using Allure.NUnit;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
@@ -14,261 +10,233 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadDialogValidationTests
         : BaseTest
     {
-        //---------------------------------
         // TC_004
-        // Verify Find Feature
-        //---------------------------------
+        // Verify find feature
 
         [Test]
-[TestCase(
-    @"C:\Temp\TestFiles\Find_Hello.txt",
-    "Hello")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Find_Hello.txt",
+            "Hello")]
 
-[TestCase(
-    @"C:\Temp\TestFiles\Find_World.txt",
-    "World")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Find_World.txt",
+            "World")]
 
-[TestCase(
-    @"C:\Temp\TestFiles\Find_FlaUI.txt",
-    "FlaUI")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Find_FlaUI.txt",
+            "FlaUI")]
 
-[Category("P2")]
-[Order(1)]
-[Description("TC_004 - Verify Find Feature")]
-public void VerifyFindFeature(
-    string filePath,
-    string searchText)
-{
-    try
-    {
-        //---------------------------------
-// BEFORE TEST
-//---------------------------------
+        [Category("P2")]
+        [Order(1)]
+        [Description("TC_004 - Verify Find Feature")]
+        public void VerifyFindFeature(
+            string filePath,
+            string searchText)
+        {
+            try
+            {
+                // BEFORE TEST
 
-if (!File.Exists(filePath))
-{
-    LoggerHelper.Log(
-        "Baseline file missing. Recreating.");
+                if (!File.Exists(filePath))
+                {
+                    LoggerHelper.Log(
+                        "Baseline file missing. Recreating.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World FlaUI");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World FlaUI");
+                }
 
-string baselineContent =
-    File.ReadAllText(
-        filePath);
+                string baselineContent =
+                    File.ReadAllText(
+                        filePath);
 
-if (!baselineContent.Contains(
-    "Hello World FlaUI"))
-{
-    LoggerHelper.Log(
-        "Invalid baseline detected. Restoring.");
+                if (!baselineContent.Contains(
+                    "Hello World FlaUI"))
+                {
+                    LoggerHelper.Log(
+                        "Invalid baseline detected. Restoring.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World FlaUI");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World FlaUI");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.True);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.True);
 
-Assert.That(
-    File.ReadAllText(filePath),
-    Does.Contain(
-        "Hello"));
+                Assert.That(
+                    File.ReadAllText(filePath),
+                    Does.Contain(
+                        "Hello"));
 
-        //---------------------------------
-        // Launch File
-        //---------------------------------
+                // Launch file
 
-        App =
-            FlaUI.Core.Application.Launch(
-                "notepad.exe",
-                filePath);
+                App =
+                    FlaUI.Core.Application.Launch(
+                        "notepad.exe",
+                        filePath);
 
-        //---------------------------------
-        // Page
-        //---------------------------------
+                // Page
 
-        var notepadPage =
-            new NotepadPage(
-                App,
-                Automation!);
+                var notepadPage =
+                    new NotepadPage(
+                        App,
+                        Automation!);
 
-        //---------------------------------
-        // Validate Window
-        //---------------------------------
+                // Validate window
 
-        WindowHelper.VerifyWindow(
-            notepadPage.Window);
+                WindowHelper.VerifyWindow(
+                    notepadPage.Window);
 
-        //---------------------------------
-        // TEST EXECUTION
-        //---------------------------------
+                // TEST EXECUTION
 
-        var findWindow =
-            notepadPage.OpenFindDialog();
+                var findWindow =
+                    notepadPage.OpenFindDialog();
 
-        notepadPage
-            .ValidateFindDialogDefaults();
+                notepadPage
+                    .ValidateFindDialogDefaults();
 
-        notepadPage.PerformFind(
-            findWindow,
-            searchText);
+                notepadPage.PerformFind(
+                    findWindow,
+                    searchText);
 
-        notepadPage.CloseFindDialog(
-            findWindow);
+                notepadPage.CloseFindDialog(
+                    findWindow);
 
-        //---------------------------------
-        // AFTER TEST
-        //---------------------------------
+                // AFTER TEST
 
-        LoggerHelper.Log(
-            "Find validation completed");
-    }
-    catch (Exception ex)
-    {
-        LoggerHelper.Log(
-            $"VerifyFindFeature failed: {ex.Message}");
+                LoggerHelper.Log(
+                    "Find validation completed");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Log(
+                    $"VerifyFindFeature failed: {ex.Message}");
 
-        throw;
-    }
-}
+                throw;
+            }
+        }
 
-        //---------------------------------
         // TC_005
-        // Verify Replace Feature
-        //---------------------------------
+        // Verify replace feature
 
         [Test]
-[TestCase(
-    @"C:\Temp\TestFiles\Replace_World.txt",
-    "World",
-    "FlaUI")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Replace_World.txt",
+            "World",
+            "FlaUI")]
 
-[TestCase(
-    @"C:\Temp\TestFiles\Replace_Hello.txt",
-    "Hello",
-    "Desktop")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Replace_Hello.txt",
+            "Hello",
+            "Desktop")]
 
-[Category("P2")]
-[Order(2)]
-[Description("TC_005 - Verify Replace Feature")]
-public void VerifyReplaceFeature(
-    string filePath,
-    string findText,
-    string replaceText)
-{
-    try
-    {
-        //---------------------------------
-// BEFORE TEST
-//---------------------------------
+        [Category("P2")]
+        [Order(2)]
+        [Description("TC_005 - Verify Replace Feature")]
+        public void VerifyReplaceFeature(
+            string filePath,
+            string findText,
+            string replaceText)
+        {
+            try
+            {
+                // BEFORE TEST
 
-if (!File.Exists(filePath))
-{
-    LoggerHelper.Log(
-        "Baseline file missing. Recreating.");
+                if (!File.Exists(filePath))
+                {
+                    LoggerHelper.Log(
+                        "Baseline file missing. Recreating.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-string baselineContent =
-    File.ReadAllText(
-        filePath);
+                string baselineContent =
+                    File.ReadAllText(
+                        filePath);
 
-if (!baselineContent.Contains(
-    "Hello World"))
-{
-    LoggerHelper.Log(
-        "Invalid baseline detected. Restoring.");
+                if (!baselineContent.Contains(
+                    "Hello World"))
+                {
+                    LoggerHelper.Log(
+                        "Invalid baseline detected. Restoring.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.True);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.True);
 
-Assert.That(
-    File.ReadAllText(filePath),
-    Does.Contain(
-        "Hello World"));
+                Assert.That(
+                    File.ReadAllText(filePath),
+                    Does.Contain(
+                        "Hello World"));
 
-        //---------------------------------
-        // Launch File
-        //---------------------------------
+                // Launch file
 
-        App =
-            FlaUI.Core.Application.Launch(
-                "notepad.exe",
-                filePath);
+                App =
+                    FlaUI.Core.Application.Launch(
+                        "notepad.exe",
+                        filePath);
 
-        //---------------------------------
-        // Page
-        //---------------------------------
+                // Page
 
-        var notepadPage =
-            new NotepadPage(
-                App,
-                Automation!);
+                var notepadPage =
+                    new NotepadPage(
+                        App,
+                        Automation!);
 
-        //---------------------------------
-        // Validate Window
-        //---------------------------------
+                // Validate window
 
-        WindowHelper.VerifyWindow(
-            notepadPage.Window);
+                WindowHelper.VerifyWindow(
+                    notepadPage.Window);
 
-        //---------------------------------
-        // TEST EXECUTION
-        //---------------------------------
+                // TEST EXECUTION
 
-        var replaceWindow =
-            notepadPage.OpenReplaceDialog();
+                var replaceWindow =
+                    notepadPage.OpenReplaceDialog();
 
-        notepadPage
-            .ValidateReplaceDialogDefaults();
+                notepadPage
+                    .ValidateReplaceDialogDefaults();
 
-        notepadPage.PerformReplace(
-            replaceWindow,
-            findText,
-            replaceText);
+                notepadPage.PerformReplace(
+                    replaceWindow,
+                    findText,
+                    replaceText);
 
-        notepadPage.CloseReplaceDialog(
-            replaceWindow);
+                notepadPage.CloseReplaceDialog(
+                    replaceWindow);
 
-        notepadPage.SaveExistingFile();
+                notepadPage.SaveExistingFile();
 
-        //---------------------------------
-        // AFTER TEST
-        //---------------------------------
+                // AFTER TEST
 
-        string content =
-            File.ReadAllText(
-                filePath);
+                string content =
+                    File.ReadAllText(
+                        filePath);
 
-        Assert.That(
-            content,
-            Does.Contain(
-                replaceText));
+                Assert.That(
+                    content,
+                    Does.Contain(
+                        replaceText));
 
-        LoggerHelper.Log(
-            "Replace validation completed");
-    }
-    catch (Exception ex)
-    {
-        LoggerHelper.Log(
-            $"VerifyReplaceFeature failed: {ex.Message}");
+                LoggerHelper.Log(
+                    "Replace validation completed");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Log(
+                    $"VerifyReplaceFeature failed: {ex.Message}");
 
-        throw;
-    }
-}
+                throw;
+            }
+        }
     }
 }

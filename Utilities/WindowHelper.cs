@@ -9,9 +9,7 @@ namespace DesktopAutomationFramework.Utilities
         {
             try
             {
-                //---------------------------------
-                // Validate Window
-                //---------------------------------
+                // Validate window
 
                 if (window == null)
                 {
@@ -19,9 +17,7 @@ namespace DesktopAutomationFramework.Utilities
                         "Window not found");
                 }
 
-                //---------------------------------
-                // Validate Enabled
-                //---------------------------------
+                // Validate enabled
 
                 if (!window.IsEnabled)
                 {
@@ -29,9 +25,7 @@ namespace DesktopAutomationFramework.Utilities
                         "Window not enabled");
                 }
 
-                //---------------------------------
                 // Logging
-                //---------------------------------
 
                 LoggerHelper.Log(
                     "Window validated");

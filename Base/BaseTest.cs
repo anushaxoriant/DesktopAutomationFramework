@@ -11,43 +11,31 @@ namespace DesktopAutomationFramework.Tests
 {
     public class BaseTest
     {
-        //---------------------------------
         // Application
-        //---------------------------------
 
         protected FlaUI.Core.Application? App;
 
-        //---------------------------------
         // Automation
-        //---------------------------------
 
         protected UIA3Automation? Automation;
 
-        //---------------------------------
-        // Before All Tests
-        //---------------------------------
+        // Before all tests
 
         [OneTimeSetUp]
         public void GlobalSetup()
         {
             try
             {
-                //---------------------------------
-                // Initialize Automation
-                //---------------------------------
+                // Initialize automation
 
                 Automation =
                     new UIA3Automation();
 
-                //---------------------------------
-                // Prepare Files
-                //---------------------------------
+                // Prepare files
 
                 FileHelper.PrepareTestFiles();
 
-                //---------------------------------
                 // Logging
-                //---------------------------------
 
                 LoggerHelper.Log(
                     "Framework initialized");
@@ -61,26 +49,20 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        //---------------------------------
-        // Before Every Test
-        //---------------------------------
+        // Before every test
 
         [SetUp]
         public void Setup()
         {
             try
             {
-                //---------------------------------
                 // Logging
-                //---------------------------------
 
                 LoggerHelper.Log(
                     $"Starting Test: " +
                     $"{TestContext.CurrentContext.Test.Name}");
 
-                //---------------------------------
                 // Reporting
-                //---------------------------------
 
                 AllureApi.Step(
                     $"Executing Test: " +
@@ -95,24 +77,18 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        //---------------------------------
-        // After Every Test
-        //---------------------------------
+        // After every test
 
         [TearDown]
         public void TearDown()
         {
             try
             {
-                //---------------------------------
-                // Kill Application
-                //---------------------------------
+                // Kill application
 
                 App?.Kill();
 
-                //---------------------------------
                 // Logging
-                //---------------------------------
 
                 LoggerHelper.Log(
                     $"Completed Test: " +
@@ -125,30 +101,22 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        //---------------------------------
-        // After All Tests
-        //---------------------------------
+        // After all tests
 
         [OneTimeTearDown]
         public void GlobalTearDown()
         {
             try
             {
-                //---------------------------------
-                // Dispose Automation
-                //---------------------------------
+                // Dispose automation
 
                 Automation?.Dispose();
 
-                //---------------------------------
-                // Cleanup Files
-                //---------------------------------
+                // Cleanup files
 
                 FileHelper.CleanupTestFiles();
 
-                //---------------------------------
                 // Logging
-                //---------------------------------
 
                 LoggerHelper.Log(
                     "Framework cleanup completed");

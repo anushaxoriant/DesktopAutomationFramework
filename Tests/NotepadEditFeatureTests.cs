@@ -1,7 +1,3 @@
-//=========================================
-// NotepadEditFeatureTests.cs
-//=========================================
-
 using Allure.NUnit;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
@@ -14,126 +10,112 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadEditFeatureTests
         : BaseTest
     {
-        //---------------------------------
         // TC_006
-        // Verify Undo Feature
-        //---------------------------------
+        // Verify undo feature
 
         [Test]
-[TestCase(
-    @"C:\Temp\TestFiles\Undo_FlaUI.txt",
-    " FlaUI and C#")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Undo_FlaUI.txt",
+            " FlaUI and C#")]
 
-[TestCase(
-    @"C:\Temp\TestFiles\Undo_Framework.txt",
-    " Automation Framework")]
+        [TestCase(
+            @"C:\Temp\TestFiles\Undo_Framework.txt",
+            " Automation Framework")]
 
-[Category("P1")]
-[Order(1)]
-[Description("TC_006 - Verify Undo Feature")]
-public void VerifyUndoFeature(
-    string filePath,
-    string appendText)
-{
-    try
-    {
-        //---------------------------------
-// BEFORE TEST
-//---------------------------------
+        [Category("P1")]
+        [Order(1)]
+        [Description("TC_006 - Verify Undo Feature")]
+        public void VerifyUndoFeature(
+            string filePath,
+            string appendText)
+        {
+            try
+            {
+                // BEFORE TEST
 
-if (!File.Exists(filePath))
-{
-    LoggerHelper.Log(
-        "Baseline file missing. Recreating.");
+                if (!File.Exists(filePath))
+                {
+                    LoggerHelper.Log(
+                        "Baseline file missing. Recreating.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-string baselineContent =
-    File.ReadAllText(
-        filePath);
+                string baselineContent =
+                    File.ReadAllText(
+                        filePath);
 
-if (!baselineContent.Contains(
-    "Hello World"))
-{
-    LoggerHelper.Log(
-        "Invalid baseline detected. Restoring.");
+                if (!baselineContent.Contains(
+                    "Hello World"))
+                {
+                    LoggerHelper.Log(
+                        "Invalid baseline detected. Restoring.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.True);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.True);
 
-Assert.That(
-    File.ReadAllText(filePath),
-    Does.Contain(
-        "Hello World"));
+                Assert.That(
+                    File.ReadAllText(filePath),
+                    Does.Contain(
+                        "Hello World"));
 
-        //---------------------------------
-        // Launch File
-        //---------------------------------
+                // Launch file
 
-        App =
-            FlaUI.Core.Application.Launch(
-                "notepad.exe",
-                filePath);
+                App =
+                    FlaUI.Core.Application.Launch(
+                        "notepad.exe",
+                        filePath);
 
-        //---------------------------------
-        // Page
-        //---------------------------------
+                // Page
 
-        var notepadPage =
-            new NotepadPage(
-                App,
-                Automation!);
+                var notepadPage =
+                    new NotepadPage(
+                        App,
+                        Automation!);
 
-        //---------------------------------
-        // Validate Window
-        //---------------------------------
+                // Validate window
 
-        WindowHelper.VerifyWindow(
-            notepadPage.Window);
+                WindowHelper.VerifyWindow(
+                    notepadPage.Window);
 
-        //---------------------------------
-        // TEST EXECUTION
-        //---------------------------------
+                // TEST EXECUTION
 
-        notepadPage.AppendText(
-            appendText);
+                notepadPage.AppendText(
+                    appendText);
 
-        notepadPage.PerformUndo();
+                notepadPage.PerformUndo();
 
-        notepadPage.SaveExistingFile();
+                notepadPage.SaveExistingFile();
 
-        //---------------------------------
-        // AFTER TEST
-        //---------------------------------
+                // AFTER TEST
 
-        string content =
-            File.ReadAllText(
-                filePath);
+                string content =
+                    File.ReadAllText(
+                        filePath);
 
-        Assert.That(
-            content.Trim(),
-            Is.EqualTo(
-                "Hello World"));
+                Assert.That(
+                    content.Trim(),
+                    Is.EqualTo(
+                        "Hello World"));
 
-        LoggerHelper.Log(
-            "Undo validation completed");
-    }
-    catch (Exception ex)
-    {
-        LoggerHelper.Log(
-            $"VerifyUndoFeature failed: {ex.Message}");
+                LoggerHelper.Log(
+                    "Undo validation completed");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Log(
+                    $"VerifyUndoFeature failed: {ex.Message}");
 
-        throw;
-    }
-}
+                throw;
+            }
+        }
     }
 }

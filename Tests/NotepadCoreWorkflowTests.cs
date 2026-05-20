@@ -1,7 +1,3 @@
-//=========================================
-// NotepadCoreWorkflowTests.cs
-//=========================================
-
 using Allure.NUnit;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
@@ -14,10 +10,8 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadCoreWorkflowTests
         : BaseTest
     {
-        //---------------------------------
         // TC_001
-        // Verify Save File
-        //---------------------------------
+        // Verify save file
 
         [Test]
         [Category("P0")]
@@ -30,58 +24,46 @@ namespace DesktopAutomationFramework.Tests
 
             try
             {
-                //---------------------------------
-// BEFORE TEST
-//---------------------------------
+                // BEFORE TEST
 
-if (File.Exists(filePath))
-{
-    File.Delete(
-        filePath);
+                if (File.Exists(filePath))
+                {
+                    File.Delete(
+                        filePath);
 
-    LoggerHelper.Log(
-        "Existing file deleted");
-}
+                    LoggerHelper.Log(
+                        "Existing file deleted");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.False);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.False);
 
-                //---------------------------------
-                // Launch App
-                //---------------------------------
+                // Launch app
 
                 App =
                     FlaUI.Core.Application.Launch(
                         @"C:\Windows\System32\notepad.exe");
 
-                //---------------------------------
                 // Page
-                //---------------------------------
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                //---------------------------------
-                // Validate Window
-                //---------------------------------
+                // Validate window
 
                 WindowHelper.VerifyWindow(
                     notepadPage.Window);
 
-                //---------------------------------
-                // Validate Editor
-                //---------------------------------
+                // Validate editor
 
                 Assert.That(
                     notepadPage.Editor,
                     Is.Not.Null);
 
-                //---------------------------------
                 // TEST EXECUTION
-                //---------------------------------
 
                 notepadPage.EnterText(
                     "Hello World");
@@ -89,9 +71,7 @@ Assert.That(
                 notepadPage.SaveFile(
                     filePath);
 
-                //---------------------------------
                 // AFTER TEST
-                //---------------------------------
 
                 Assert.That(
                     File.Exists(filePath),
@@ -118,130 +98,114 @@ Assert.That(
             }
         }
 
-        //---------------------------------
         // TC_002
-        // Verify Append Text
-        //---------------------------------
+        // Verify append text
 
         [Test]
-[TestCase(
-    @"C:\Temp\TestFiles\AppendText_FlaUI.txt",
-    " FlaUI and C#")]
+        [TestCase(
+            @"C:\Temp\TestFiles\AppendText_FlaUI.txt",
+            " FlaUI and C#")]
 
-[TestCase(
-    @"C:\Temp\TestFiles\AppendText_Automation.txt",
-    " Automation Testing")]
+        [TestCase(
+            @"C:\Temp\TestFiles\AppendText_Automation.txt",
+            " Automation Testing")]
 
-[Category("P0")]
-[Order(2)]
-[Description("TC_002 - Verify Append Text")]
-public void VerifyAppendText(
-    string filePath,
-    string appendText)
-{
-    try
-    {
-        //---------------------------------
-// BEFORE TEST
-//---------------------------------
+        [Category("P0")]
+        [Order(2)]
+        [Description("TC_002 - Verify Append Text")]
+        public void VerifyAppendText(
+            string filePath,
+            string appendText)
+        {
+            try
+            {
+                // BEFORE TEST
 
-if (!File.Exists(filePath))
-{
-    LoggerHelper.Log(
-        "Baseline file missing. Recreating.");
+                if (!File.Exists(filePath))
+                {
+                    LoggerHelper.Log(
+                        "Baseline file missing. Recreating.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-string baselineContent =
-    File.ReadAllText(
-        filePath);
+                string baselineContent =
+                    File.ReadAllText(
+                        filePath);
 
-if (!baselineContent.Contains(
-    "Hello World"))
-{
-    LoggerHelper.Log(
-        "Invalid baseline detected. Restoring.");
+                if (!baselineContent.Contains(
+                    "Hello World"))
+                {
+                    LoggerHelper.Log(
+                        "Invalid baseline detected. Restoring.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.True);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.True);
 
-Assert.That(
-    File.ReadAllText(filePath),
-    Does.Contain(
-        "Hello World"));
+                Assert.That(
+                    File.ReadAllText(filePath),
+                    Does.Contain(
+                        "Hello World"));
 
-        //---------------------------------
-        // Launch File
-        //---------------------------------
+                // Launch file
 
-        App =
-            FlaUI.Core.Application.Launch(
-                "notepad.exe",
-                filePath);
+                App =
+                    FlaUI.Core.Application.Launch(
+                        "notepad.exe",
+                        filePath);
 
-        //---------------------------------
-        // Page
-        //---------------------------------
+                // Page
 
-        var notepadPage =
-            new NotepadPage(
-                App,
-                Automation!);
+                var notepadPage =
+                    new NotepadPage(
+                        App,
+                        Automation!);
 
-        //---------------------------------
-        // Validate Window
-        //---------------------------------
+                // Validate window
 
-        WindowHelper.VerifyWindow(
-            notepadPage.Window);
+                WindowHelper.VerifyWindow(
+                    notepadPage.Window);
 
-        //---------------------------------
-        // TEST EXECUTION
-        //---------------------------------
+                // TEST EXECUTION
 
-        notepadPage.AppendText(
-            appendText);
+                notepadPage.AppendText(
+                    appendText);
 
-        notepadPage.SaveExistingFile();
+                notepadPage.SaveExistingFile();
 
-        //---------------------------------
-        // AFTER TEST
-        //---------------------------------
+                // AFTER TEST
 
-        string content =
-            File.ReadAllText(
-                filePath);
+                string content =
+                    File.ReadAllText(
+                        filePath);
 
-        Assert.That(
-            content,
-            Does.Contain(
-                appendText.Trim()));
+                Assert.That(
+                    content,
+                    Does.Contain(
+                        appendText.Trim()));
 
-        LoggerHelper.Log(
-            "Append validation completed");
-    }
-    catch (Exception ex)
-    {
-        LoggerHelper.Log(
-            $"VerifyAppendText failed: {ex.Message}");
+                LoggerHelper.Log(
+                    "Append validation completed");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Log(
+                    $"VerifyAppendText failed: {ex.Message}");
 
-        throw;
-    }
-}
+                throw;
+            }
+        }
 
-        //---------------------------------
         // TC_003
-        // Verify Clear Text
-        //---------------------------------
+        // Verify clear text
 
         [Test]
         [Category("P0")]
@@ -254,72 +218,62 @@ Assert.That(
 
             try
             {
-                //---------------------------------
-// BEFORE TEST
-//---------------------------------
+                // BEFORE TEST
 
-if (!File.Exists(filePath))
-{
-    LoggerHelper.Log(
-        "Baseline file missing. Recreating.");
+                if (!File.Exists(filePath))
+                {
+                    LoggerHelper.Log(
+                        "Baseline file missing. Recreating.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-string baselineContent =
-    File.ReadAllText(
-        filePath);
+                string baselineContent =
+                    File.ReadAllText(
+                        filePath);
 
-if (!baselineContent.Contains(
-    "Hello World"))
-{
-    LoggerHelper.Log(
-        "Invalid baseline detected. Restoring.");
+                if (!baselineContent.Contains(
+                    "Hello World"))
+                {
+                    LoggerHelper.Log(
+                        "Invalid baseline detected. Restoring.");
 
-    File.WriteAllText(
-        filePath,
-        "Hello World");
-}
+                    File.WriteAllText(
+                        filePath,
+                        "Hello World");
+                }
 
-Assert.That(
-    File.Exists(filePath),
-    Is.True);
+                Assert.That(
+                    File.Exists(filePath),
+                    Is.True);
 
-Assert.That(
-    File.ReadAllText(filePath),
-    Does.Contain(
-        "Hello World"));
+                Assert.That(
+                    File.ReadAllText(filePath),
+                    Does.Contain(
+                        "Hello World"));
 
-                //---------------------------------
-                // Launch File
-                //---------------------------------
+                // Launch file
 
                 App =
                     FlaUI.Core.Application.Launch(
                         "notepad.exe",
                         filePath);
 
-                //---------------------------------
                 // Page
-                //---------------------------------
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                //---------------------------------
-                // Validate Window
-                //---------------------------------
+                // Validate window
 
                 WindowHelper.VerifyWindow(
                     notepadPage.Window);
 
-                //---------------------------------
                 // TEST EXECUTION
-                //---------------------------------
 
                 notepadPage.SelectAllText();
 
@@ -327,9 +281,7 @@ Assert.That(
 
                 notepadPage.SaveExistingFile();
 
-                //---------------------------------
                 // AFTER TEST
-                //---------------------------------
 
                 string content =
                     File.ReadAllText(
