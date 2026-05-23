@@ -58,7 +58,8 @@ pipeline
             allure(
                 includeProperties: false,
                 jdk: '',
-                results: [[path:'bin/Debug/net8.0-windows/allure-results']]
+                results: [[path:'bin/Debug/net8.0-windows/allure-results']],
+				commandline: 'Allure'
             )
         }
     }
