@@ -33,9 +33,6 @@ pipeline
 {
     steps
     {
-        catchError(
-            buildResult: 'UNSTABLE',
-            stageResult: 'FAILURE')
         {
             bat 'dotnet test --logger trx'
         }
