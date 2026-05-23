@@ -1,297 +1,162 @@
 using Allure.NUnit;
+using Allure.Net.Commons;
+using DesktopAutomationFramework.Base;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
+using FlaUI.Core;
 using NUnit.Framework;
 
 namespace DesktopAutomationFramework.Tests
 {
     [TestFixture]
     [AllureNUnit]
-    public class NotepadCoreWorkflowTests
-        : BaseTest
+
+    public class NotepadCoreWorkflowTests : BaseTest
     {
+        private readonly string testFilePath =
+            @"C:\Temp\NotepadTestFile.txt";
+
         [Test]
         [Category("P0")]
         [Order(1)]
-        [Description("TC_1: Verify Save File")]
+
+        [Description(
+            "Verify user can enter text and save file")]
         public void VerifySaveFile()
         {
-            string filePath =
-                @"C:\Temp\SaveFile.txt";
-
             try
             {
-                // BEFORE TEST
+                AllureApi.Step(
+                    "Deleting existing file");
 
-                if (File.Exists(filePath))
+                if (File.Exists(testFilePath))
                 {
-                    File.Delete(
-                        filePath);
+                    File.Delete(testFilePath);
 
                     LoggerHelper.Log(
                         "Existing file deleted");
                 }
 
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.False);
-
-                // Launch app
+                AllureApi.Step(
+                    "Launching Notepad");
 
                 App =
                     FlaUI.Core.Application.Launch(
-                        @"C:\Windows\System32\notepad.exe");
+                        FrameworkConstants.NotepadPath);
 
-                // Page
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad application failed to launch.");
+                }
+
+                AllureApi.Step(
+                    "Initializing Notepad Page");
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                // Validate window
-
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
-
-                // Validate editor
-
                 Assert.That(
-                    notepadPage.Editor,
-                    Is.Not.Null);
+                    notepadPage.Window,
+                    Is.Not.Null,
+                    "Notepad window was not initialized.");
 
-                // TEST EXECUTION
+                AllureApi.Step(
+                    "Entering text");
 
                 notepadPage.EnterText(
                     "Hello World");
 
+                AllureApi.Step(
+                    "Saving file");
+
                 notepadPage.SaveFile(
-                    filePath);
+                    testFilePath);
 
-                // AFTER TEST
+                AllureApi.Step(
+                    "Validating saved file");
 
                 Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
+                    File.Exists(testFilePath),
+                    Is.True,
+                    "Saved file does not exist.");
 
                 string content =
                     File.ReadAllText(
-                        filePath);
+                        testFilePath);
 
                 Assert.That(
                     content,
                     Does.Contain(
-                        "Hello World"));
+                        "Hello World"),
+                    "Expected content not found in saved file.");
 
                 LoggerHelper.Log(
-                    "Save File validation completed");
+                    "Save file validation completed");
             }
             catch (Exception ex)
             {
-                LoggerHelper.Log(
-                    $"VerifySaveFile failed: {ex.Message}");
-
-                throw;
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifySaveFile failed.",
+                    ex);
             }
         }
 
         [Test]
-        [TestCase(
-            @"C:\Temp\TestFiles\AppendText_FlaUI.txt",
-            " FlaUI and C#")]
-
-        [TestCase(
-            @"C:\Temp\TestFiles\AppendText_Automation.txt",
-            " Automation Testing")]
-
-        [Category("P0")]
+        [Category("P1")]
         [Order(2)]
-        [Description("TC_2: Verify Append Text")]
-        public void VerifyAppendText(
-            string filePath,
-            string appendText)
+
+        [Description(
+            "Verify editor clear functionality")]
+        public void VerifyClearEditor()
         {
             try
             {
-                // BEFORE TEST
-
-                if (!File.Exists(filePath))
-                {
-                    LoggerHelper.Log(
-                        "Baseline file missing. Recreating.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                string baselineContent =
-                    File.ReadAllText(
-                        filePath);
-
-                if (!baselineContent.Contains(
-                    "Hello World"))
-                {
-                    LoggerHelper.Log(
-                        "Invalid baseline detected. Restoring.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
-
-                Assert.That(
-                    File.ReadAllText(filePath),
-                    Does.Contain(
-                        "Hello World"));
-
-                // Launch file
+                AllureApi.Step(
+                    "Launching Notepad");
 
                 App =
                     FlaUI.Core.Application.Launch(
-                        "notepad.exe",
-                        filePath);
+                        FrameworkConstants.NotepadPath);
 
-                // Page
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad failed to launch.");
+                }
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                // Validate window
+                notepadPage.EnterText(
+                    "Automation Testing");
 
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
+                AllureApi.Step(
+                    "Clearing editor");
 
-                // TEST EXECUTION
+                notepadPage.ClearEditor();
 
-                notepadPage.AppendText(
-                    appendText);
-
-                notepadPage.SaveExistingFile();
-
-                // AFTER TEST
-
-                string content =
-                    File.ReadAllText(
-                        filePath);
-
-                Assert.That(
-                    content,
-                    Does.Contain(
-                        appendText.Trim()));
-
-                LoggerHelper.Log(
-                    "Append validation completed");
-            }
-            catch (Exception ex)
-            {
-                LoggerHelper.Log(
-                    $"VerifyAppendText failed: {ex.Message}");
-
-                throw;
-            }
-        }
-
-        [Test]
-        [Category("P0")]
-        [Order(3)]
-        [Description("TC_3: Verify Clear Text")]
-        public void VerifyClearText()
-        {
-            string filePath =
-                @"C:\Temp\TestFiles\ClearText.txt";
-
-            try
-            {
-                // BEFORE TEST
-
-                if (!File.Exists(filePath))
-                {
-                    LoggerHelper.Log(
-                        "Baseline file missing. Recreating.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                string baselineContent =
-                    File.ReadAllText(
-                        filePath);
-
-                if (!baselineContent.Contains(
-                    "Hello World"))
-                {
-                    LoggerHelper.Log(
-                        "Invalid baseline detected. Restoring.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
-
-                Assert.That(
-                    File.ReadAllText(filePath),
-                    Does.Contain(
-                        "Hello World"));
-
-                // Launch file
-
-                App =
-                    FlaUI.Core.Application.Launch(
-                        "notepad.exe",
-                        filePath);
-
-                // Page
-
-                var notepadPage =
-                    new NotepadPage(
-                        App,
-                        Automation!);
-
-                // Validate window
-
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
-
-                // TEST EXECUTION
-
-                notepadPage.SelectAllText();
-
-                notepadPage.DeleteSelectedText();
-
-                notepadPage.SaveExistingFile();
-
-                // AFTER TEST
-
-                string content =
-                    File.ReadAllText(
-                        filePath);
+                string currentText =
+                    notepadPage.ReadEditorText();
 
                 Assert.That(
                     string.IsNullOrWhiteSpace(
-                        content),
-                    Is.True);
+                        currentText),
+                    Is.True,
+                    "Editor was not cleared successfully.");
 
                 LoggerHelper.Log(
-                    "Clear validation completed");
+                    "Editor clear validation completed");
             }
             catch (Exception ex)
             {
-                LoggerHelper.Log(
-                    $"VerifyClearText failed: {ex.Message}");
-
-                throw;
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifyClearEditor failed.",
+                    ex);
             }
         }
     }

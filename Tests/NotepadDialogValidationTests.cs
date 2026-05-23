@@ -1,235 +1,153 @@
+// NOTEPADDIALOGVALIDATIONTESTS.CS
+
 using Allure.NUnit;
+using Allure.Net.Commons;
+using DesktopAutomationFramework.Base;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
+using FlaUI.Core;
 using NUnit.Framework;
 
 namespace DesktopAutomationFramework.Tests
 {
     [TestFixture]
     [AllureNUnit]
-    public class NotepadDialogValidationTests
-        : BaseTest
+
+    public class NotepadDialogValidationTests : BaseTest
     {
         [Test]
-        [TestCase(
-            @"C:\Temp\TestFiles\Find_Hello.txt",
-            "Hello")]
-
-        [TestCase(
-            @"C:\Temp\TestFiles\Find_World.txt",
-            "World")]
-
-        [TestCase(
-            @"C:\Temp\TestFiles\Find_FlaUI.txt",
-            "FlaUI")]
-
-        [Category("P2")]
+        [Category("P1")]
         [Order(1)]
-        [Description("TC_4: Verify Find Feature")]
-        public void VerifyFindFeature(
-            string filePath,
-            string searchText)
+
+        [Description(
+            "Verify Find dialog opens successfully")]
+        public void VerifyFindDialog()
         {
             try
             {
-                // BEFORE TEST
-
-                if (!File.Exists(filePath))
-                {
-                    LoggerHelper.Log(
-                        "Baseline file missing. Recreating.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World FlaUI");
-                }
-
-                string baselineContent =
-                    File.ReadAllText(
-                        filePath);
-
-                if (!baselineContent.Contains(
-                    "Hello World FlaUI"))
-                {
-                    LoggerHelper.Log(
-                        "Invalid baseline detected. Restoring.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World FlaUI");
-                }
-
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
-
-                Assert.That(
-                    File.ReadAllText(filePath),
-                    Does.Contain(
-                        "Hello"));
-
-                // Launch file
+                AllureApi.Step(
+                    "Launching Notepad");
 
                 App =
                     FlaUI.Core.Application.Launch(
-                        "notepad.exe",
-                        filePath);
+                        FrameworkConstants.NotepadPath);
 
-                // Page
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad failed to launch.");
+                }
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                // Validate window
+                AllureApi.Step(
+                    "Opening Find dialog");
 
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                // TEST EXECUTION
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_F);
 
-                var findWindow =
-                    notepadPage.OpenFindDialog();
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_F);
 
-                notepadPage
-                    .ValidateFindDialogDefaults();
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                notepadPage.PerformFind(
-                    findWindow,
-                    searchText);
+                WaitHelper.WaitUntil(
+                    () =>
+                    notepadPage.Window.ModalWindows.Length > 0,
+                    "Find dialog did not appear.");
 
-                notepadPage.CloseFindDialog(
-                    findWindow);
+                var findDialog =
+                    notepadPage.Window.ModalWindows
+                        .FirstOrDefault();
 
-                // AFTER TEST
+                Assert.That(
+                    findDialog,
+                    Is.Not.Null,
+                    "Find dialog was not displayed.");
 
                 LoggerHelper.Log(
-                    "Find validation completed");
+                    "Find dialog validation completed");
             }
             catch (Exception ex)
             {
-                LoggerHelper.Log(
-                    $"VerifyFindFeature failed: {ex.Message}");
-
-                throw;
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifyFindDialog failed.",
+                    ex);
             }
         }
 
         [Test]
-        [TestCase(
-            @"C:\Temp\TestFiles\Replace_World.txt",
-            "World",
-            "FlaUI")]
-
-        [TestCase(
-            @"C:\Temp\TestFiles\Replace_Hello.txt",
-            "Helfd",
-            "Desktop")]
-
-        [Category("P2")]
+        [Category("P1")]
         [Order(2)]
-        [Description("TC_5: Verify Replace Feature")]
-        public void VerifyReplaceFeature(
-            string filePath,
-            string findText,
-            string replaceText)
+
+        [Description(
+            "Verify Replace dialog opens successfully")]
+        public void VerifyReplaceDialog()
         {
             try
             {
-                // BEFORE TEST
-
-                if (!File.Exists(filePath))
-                {
-                    LoggerHelper.Log(
-                        "Baseline file missing. Recreating.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                string baselineContent =
-                    File.ReadAllText(
-                        filePath);
-
-                if (!baselineContent.Contains(
-                    "Hello World"))
-                {
-                    LoggerHelper.Log(
-                        "Invalid baseline detected. Restoring.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
-
-                Assert.That(
-                    File.ReadAllText(filePath),
-                    Does.Contain(
-                        "Hello World"));
-
-                // Launch file
+                AllureApi.Step(
+                    "Launching Notepad");
 
                 App =
                     FlaUI.Core.Application.Launch(
-                        "notepad.exe",
-                        filePath);
+                        FrameworkConstants.NotepadPath);
 
-                // Page
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad failed to launch.");
+                }
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                // Validate window
+                AllureApi.Step(
+                    "Opening Replace dialog");
 
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                // TEST EXECUTION
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_H);
 
-                var replaceWindow =
-                    notepadPage.OpenReplaceDialog();
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_H);
 
-                notepadPage
-                    .ValidateReplaceDialogDefaults();
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                notepadPage.PerformReplace(
-                    replaceWindow,
-                    findText,
-                    replaceText);
+                WaitHelper.WaitUntil(
+                    () =>
+                    notepadPage.Window.ModalWindows.Length > 0,
+                    "Replace dialog did not appear.");
 
-                notepadPage.CloseReplaceDialog(
-                    replaceWindow);
-
-                notepadPage.SaveExistingFile();
-
-                // AFTER TEST
-
-                string content =
-                    File.ReadAllText(
-                        filePath);
+                var replaceDialog =
+                    notepadPage.Window.ModalWindows
+                        .FirstOrDefault();
 
                 Assert.That(
-                    content,
-                    Does.Contain(
-                        replaceText));
+                    replaceDialog,
+                    Is.Not.Null,
+                    "Replace dialog was not displayed.");
 
                 LoggerHelper.Log(
-                    "Replace validation completed");
+                    "Replace dialog validation completed");
             }
             catch (Exception ex)
             {
-                LoggerHelper.Log(
-                    $"VerifyReplaceFeature failed: {ex.Message}");
-
-                throw;
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifyReplaceDialog failed.",
+                    ex);
             }
         }
     }

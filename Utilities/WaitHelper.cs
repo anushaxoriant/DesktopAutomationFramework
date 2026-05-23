@@ -1,4 +1,5 @@
-using FlaUI.Core.AutomationElements;
+using System;
+using System.Threading;
 
 namespace DesktopAutomationFramework.Utilities
 {
@@ -6,34 +7,30 @@ namespace DesktopAutomationFramework.Utilities
     {
         public static void WaitUntil(
             Func<bool> condition,
-            int timeoutInSeconds = 10,
-            string errorMessage = "Condition not met")
+            string timeoutMessage,
+            int timeout = FrameworkConstants.DefaultTimeout)
         {
-            var startTime = DateTime.Now;
+            var endTime =
+                DateTime.Now.AddMilliseconds(timeout);
 
-            while (
-                DateTime.Now - startTime <
-                TimeSpan.FromSeconds(timeoutInSeconds))
+            while (DateTime.Now < endTime)
             {
-                if (condition())
+                try
                 {
-                    return;
+                    if (condition())
+                    {
+                        return;
+                    }
+                }
+                catch
+                {
                 }
 
-                Task.Delay(100).Wait();
+                Thread.Sleep(500);
             }
 
-            throw new Exception(errorMessage);
-        }
-
-        public static void WaitForElement(
-            AutomationElement element,
-            int timeoutInSeconds = 10)
-        {
-            WaitUntil(
-                () => element != null && element.IsEnabled,
-                timeoutInSeconds,
-                "Element not enabled");
+            throw new TimeoutException(
+                timeoutMessage);
         }
     }
 }

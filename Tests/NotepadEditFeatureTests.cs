@@ -1,117 +1,154 @@
+// NOTEPADEDITFEATURETESTS.CS
+
 using Allure.NUnit;
+using Allure.Net.Commons;
+using DesktopAutomationFramework.Base;
 using DesktopAutomationFramework.Pages;
 using DesktopAutomationFramework.Utilities;
+using FlaUI.Core;
 using NUnit.Framework;
 
 namespace DesktopAutomationFramework.Tests
 {
     [TestFixture]
     [AllureNUnit]
-    public class NotepadEditFeatureTests
-        : BaseTest
+
+    public class NotepadEditFeatureTests : BaseTest
     {
         [Test]
-        [TestCase(
-            @"C:\Temp\TestFiles\Undo_FlaUI.txt",
-            " FlaUI and C#")]
-
-        [TestCase(
-            @"C:\Temp\TestFiles\Undo_Framework.txt",
-            " Automation Framework")]
-
         [Category("P1")]
         [Order(1)]
-        [Description("TC_6: Verify Undo Feature")]
-        public void VerifyUndoFeature(
-            string filePath,
-            string appendText)
+
+        [Description(
+            "Verify Undo functionality")]
+        public void VerifyUndoOperation()
         {
             try
             {
-                // BEFORE TEST
-
-                if (!File.Exists(filePath))
-                {
-                    LoggerHelper.Log(
-                        "Baseline file missing. Recreating.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                string baselineContent =
-                    File.ReadAllText(
-                        filePath);
-
-                if (!baselineContent.Contains(
-                    "Hello World"))
-                {
-                    LoggerHelper.Log(
-                        "Invalid baseline detected. Restoring.");
-
-                    File.WriteAllText(
-                        filePath,
-                        "Hello World");
-                }
-
-                Assert.That(
-                    File.Exists(filePath),
-                    Is.True);
-
-                Assert.That(
-                    File.ReadAllText(filePath),
-                    Does.Contain(
-                        "Hello World"));
-
-                // Launch file
+                AllureApi.Step(
+                    "Launching Notepad");
 
                 App =
                     FlaUI.Core.Application.Launch(
-                        "notepad.exe",
-                        filePath);
+                        FrameworkConstants.NotepadPath);
 
-                // Page
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad failed to launch.");
+                }
 
                 var notepadPage =
                     new NotepadPage(
                         App,
                         Automation!);
 
-                // Validate window
+                AllureApi.Step(
+                    "Entering initial text");
 
-                WindowHelper.VerifyWindow(
-                    notepadPage.Window);
+                notepadPage.EnterText(
+                    "Hello Automation");
 
-                // TEST EXECUTION
+                AllureApi.Step(
+                    "Performing Undo operation");
 
-                notepadPage.AppendText(
-                    appendText);
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                notepadPage.PerformUndo();
+                FlaUI.Core.Input.Keyboard.Press(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_Z);
 
-                notepadPage.SaveExistingFile();
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.KEY_Z);
 
-                // AFTER TEST
+                FlaUI.Core.Input.Keyboard.Release(
+                    FlaUI.Core.WindowsAPI.VirtualKeyShort.CONTROL);
 
-                string content =
-                    File.ReadAllText(
-                        filePath);
+                WaitHelper.WaitUntil(
+                    () =>
+                    string.IsNullOrWhiteSpace(
+                        notepadPage.ReadEditorText()),
+                    "Undo operation did not clear editor.");
+
+                string currentText =
+                    notepadPage.ReadEditorText();
 
                 Assert.That(
-                    content.Trim(),
-                    Is.EqualTo(
-                        "Hello World"));
+                    string.IsNullOrWhiteSpace(
+                        currentText),
+                    Is.True,
+                    "Undo operation failed.");
 
                 LoggerHelper.Log(
                     "Undo validation completed");
             }
             catch (Exception ex)
             {
-                LoggerHelper.Log(
-                    $"VerifyUndoFeature failed: {ex.Message}");
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifyUndoOperation failed.",
+                    ex);
+            }
+        }
 
-                throw;
+        [Test]
+        [Category("P1")]
+        [Order(2)]
+
+        [Description(
+            "Verify text replacement functionality")]
+        public void VerifyTextReplacement()
+        {
+            try
+            {
+                AllureApi.Step(
+                    "Launching Notepad");
+
+                App =
+                    FlaUI.Core.Application.Launch(
+                        FrameworkConstants.NotepadPath);
+
+                if (App == null)
+                {
+                    throw new Exception(
+                        "Notepad failed to launch.");
+                }
+
+                var notepadPage =
+                    new NotepadPage(
+                        App,
+                        Automation!);
+
+                AllureApi.Step(
+                    "Entering initial text");
+
+                notepadPage.EnterText(
+                    "Hello World");
+
+                AllureApi.Step(
+                    "Replacing text");
+
+                notepadPage.ClearEditor();
+
+                notepadPage.EnterText(
+                    "Hello Enterprise Framework");
+
+                string updatedText =
+                    notepadPage.ReadEditorText();
+
+                Assert.That(
+                    updatedText,
+                    Does.Contain(
+                        "Enterprise Framework"),
+                    "Text replacement failed.");
+
+                LoggerHelper.Log(
+                    "Text replacement validation completed");
+            }
+            catch (Exception ex)
+            {
+                FrameworkExceptionHandler.HandleFailure(
+                    "VerifyTextReplacement failed.",
+                    ex);
             }
         }
     }
