@@ -33,9 +33,7 @@ pipeline
 {
     steps
     {
-        {
             bat 'dotnet test --logger trx'
-        }
     }
 }
 
