@@ -30,12 +30,17 @@ pipeline
         }
 
         stage('Execute Tests')
+{
+    steps
+    {
+        catchError(
+            buildResult: 'UNSTABLE',
+            stageResult: 'FAILURE')
         {
-            steps
-            {
-                bat 'dotnet test --logger trx'
-            }
+            bat 'dotnet test --logger trx'
         }
+    }
+}
 
         stage('Generate Allure Report')
 {
