@@ -10,13 +10,10 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadCoreWorkflowTests
         : BaseTest
     {
-        // TC_001
-        // Verify save file
-
         [Test]
         [Category("P0")]
         [Order(1)]
-        [Description("TC_001 - Verify Save File")]
+        [Description("TC_1: Verify Save File")]
         public void VerifySaveFile()
         {
             string filePath =
@@ -98,9 +95,6 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        // TC_002
-        // Verify append text
-
         [Test]
         [TestCase(
             @"C:\Temp\TestFiles\AppendText_FlaUI.txt",
@@ -112,7 +106,7 @@ namespace DesktopAutomationFramework.Tests
 
         [Category("P0")]
         [Order(2)]
-        [Description("TC_002 - Verify Append Text")]
+        [Description("TC_2: Verify Append Text")]
         public void VerifyAppendText(
             string filePath,
             string appendText)
@@ -204,13 +198,10 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        // TC_003
-        // Verify clear text
-
         [Test]
         [Category("P0")]
         [Order(3)]
-        [Description("TC_003 - Verify Clear Text")]
+        [Description("TC_3: Verify Clear Text")]
         public void VerifyClearText()
         {
             string filePath =

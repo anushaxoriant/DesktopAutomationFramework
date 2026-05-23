@@ -10,9 +10,6 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadDialogValidationTests
         : BaseTest
     {
-        // TC_004
-        // Verify find feature
-
         [Test]
         [TestCase(
             @"C:\Temp\TestFiles\Find_Hello.txt",
@@ -28,7 +25,7 @@ namespace DesktopAutomationFramework.Tests
 
         [Category("P2")]
         [Order(1)]
-        [Description("TC_004 - Verify Find Feature")]
+        [Description("TC_4: Verify Find Feature")]
         public void VerifyFindFeature(
             string filePath,
             string searchText)
@@ -119,9 +116,6 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        // TC_005
-        // Verify replace feature
-
         [Test]
         [TestCase(
             @"C:\Temp\TestFiles\Replace_World.txt",
@@ -130,12 +124,12 @@ namespace DesktopAutomationFramework.Tests
 
         [TestCase(
             @"C:\Temp\TestFiles\Replace_Hello.txt",
-            "Hello",
+            "Helfd",
             "Desktop")]
 
         [Category("P2")]
         [Order(2)]
-        [Description("TC_005 - Verify Replace Feature")]
+        [Description("TC_5: Verify Replace Feature")]
         public void VerifyReplaceFeature(
             string filePath,
             string findText,

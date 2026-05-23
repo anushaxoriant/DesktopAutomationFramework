@@ -9,12 +9,7 @@ namespace DesktopAutomationFramework.Pages
 {
     public class NotepadPage
     {
-        // Window
-
-        private readonly Window _window;
-
-        // Constructor
-
+        private readonly Window window;
         public NotepadPage(
             FlaUI.Core.Application app,
             UIA3Automation automation)
@@ -29,7 +24,7 @@ namespace DesktopAutomationFramework.Pages
                 10,
                 "Main window not found");
 
-            _window =
+            window =
                 app.GetMainWindow(
                     automation)
 
@@ -37,7 +32,7 @@ namespace DesktopAutomationFramework.Pages
                     "Window not found");
 
             WindowHelper.VerifyWindow(
-                _window);
+                window);
 
             InitializeWindow();
 
@@ -45,21 +40,17 @@ namespace DesktopAutomationFramework.Pages
                 "Notepad page initialized");
         }
 
-        // Public window
-
         public Window Window =>
-            _window;
-
-        // Editor
+            window;
 
         public FlaUI.Core.AutomationElements.TextBox Editor =>
-            _window.FindFirstDescendant(
+            window.FindFirstDescendant(
                 cf => cf.ByAutomationId(
                     "15"))
 
             ?.AsTextBox()
 
-            ?? _window.FindFirstDescendant(
+            ?? window.FindFirstDescendant(
                 cf => cf.ByName(
                     "Text Editor"))
 
@@ -67,8 +58,6 @@ namespace DesktopAutomationFramework.Pages
 
             ?? throw new Exception(
                 "Editor not found");
-
-        // Delay
 
         private void ApplyDemoDelay()
         {
@@ -83,9 +72,9 @@ namespace DesktopAutomationFramework.Pages
             LoggerHelper.Log(
                 "Maximizing window");
 
-            _window.Focus();
+            window.Focus();
 
-            _window.Patterns
+            window.Patterns
                 .Window.Pattern
                 .SetWindowVisualState(
                     FlaUI.Core.Definitions.WindowVisualState.Maximized);
@@ -114,12 +103,18 @@ namespace DesktopAutomationFramework.Pages
 
             if (element.Patterns.Invoke.IsSupported)
             {
+                LoggerHelper.Log(
+                    "Using InvokePattern interaction");
+
                 element.Patterns
                     .Invoke.Pattern
                     .Invoke();
             }
             else
             {
+                LoggerHelper.Log(
+                    "InvokePattern unsupported. Using mouse click fallback");
+
                 // Mouse fallback
 
                 var point =
@@ -149,7 +144,7 @@ namespace DesktopAutomationFramework.Pages
             // Parent menu
 
             var parent =
-                _window.FindFirstDescendant(
+                window.FindFirstDescendant(
                     cf => cf.ByName(
                         parentMenu))
 
@@ -164,7 +159,7 @@ namespace DesktopAutomationFramework.Pages
             // Desktop
 
             var desktop =
-                _window.Automation
+                window.Automation
                 .GetDesktop();
 
             // Wait child menu
@@ -206,7 +201,13 @@ namespace DesktopAutomationFramework.Pages
             LoggerHelper.Log(
                 $"Entering text: {text}");
 
+            // Focus editor
+
             Editor.Focus();
+
+            ApplyDemoDelay();
+
+            // Direct stable insertion
 
             Editor.Enter(
                 text);
@@ -225,7 +226,13 @@ namespace DesktopAutomationFramework.Pages
             LoggerHelper.Log(
                 $"Appending text: {text}");
 
+            // Focus editor
+
             Editor.Focus();
+
+            ApplyDemoDelay();
+
+            // Move cursor to end
 
             Keyboard.Press(
                 VirtualKeyShort.END);
@@ -234,6 +241,8 @@ namespace DesktopAutomationFramework.Pages
                 VirtualKeyShort.END);
 
             ApplyDemoDelay();
+
+            // Human-like typing
 
             Keyboard.Type(
                 text);
@@ -252,8 +261,6 @@ namespace DesktopAutomationFramework.Pages
             LoggerHelper.Log(
                 $"Saving file: {filePath}");
 
-            // File -> Save
-
             ClickMenu(
                 "File",
                 "Save");
@@ -262,14 +269,14 @@ namespace DesktopAutomationFramework.Pages
 
             WaitHelper.WaitUntil(
                 () =>
-                    _window.ModalWindows.Length > 0,
+                    window.ModalWindows.Length > 0,
                 10,
                 "Save dialog not found");
 
             // Save window
 
             var saveWindow =
-                _window.ModalWindows[0];
+                window.ModalWindows[0];
 
             // File name textbox
 
@@ -649,7 +656,7 @@ namespace DesktopAutomationFramework.Pages
             string dialogName)
         {
             var desktop =
-                _window.Automation
+                window.Automation
                 .GetDesktop();
 
             WaitHelper.WaitUntil(
@@ -684,7 +691,7 @@ namespace DesktopAutomationFramework.Pages
             try
             {
                 var desktop =
-                    _window.Automation
+                    window.Automation
                     .GetDesktop();
 
                 var popup =
@@ -721,7 +728,6 @@ namespace DesktopAutomationFramework.Pages
             }
             catch
             {
-                // Ignore popup failures
             }
         }
     }

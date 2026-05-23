@@ -1,7 +1,3 @@
-//=========================================
-// BaseTest.cs
-//=========================================
-
 using Allure.Net.Commons;
 using FlaUI.UIA3;
 using NUnit.Framework;
@@ -11,16 +7,8 @@ namespace DesktopAutomationFramework.Tests
 {
     public class BaseTest
     {
-        // Application
-
         protected FlaUI.Core.Application? App;
-
-        // Automation
-
         protected UIA3Automation? Automation;
-
-        // Before all tests
-
         [OneTimeSetUp]
         public void GlobalSetup()
         {
@@ -48,9 +36,6 @@ namespace DesktopAutomationFramework.Tests
                 throw;
             }
         }
-
-        // Before every test
-
         [SetUp]
         public void Setup()
         {
@@ -76,9 +61,6 @@ namespace DesktopAutomationFramework.Tests
                 throw;
             }
         }
-
-        // After every test
-
         [TearDown]
         public void TearDown()
         {
@@ -101,23 +83,15 @@ namespace DesktopAutomationFramework.Tests
             }
         }
 
-        // After all tests
-
         [OneTimeTearDown]
         public void GlobalTearDown()
         {
             try
             {
-                // Dispose automation
 
                 Automation?.Dispose();
 
-                // Cleanup files
-
                 FileHelper.CleanupTestFiles();
-
-                // Logging
-
                 LoggerHelper.Log(
                     "Framework cleanup completed");
             }

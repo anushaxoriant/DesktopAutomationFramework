@@ -9,24 +9,17 @@ namespace DesktopAutomationFramework.Utilities
         {
             try
             {
-                // Validate window
-
                 if (window == null)
                 {
                     throw new Exception(
                         "Window not found");
                 }
 
-                // Validate enabled
-
                 if (!window.IsEnabled)
                 {
                     throw new Exception(
                         "Window not enabled");
                 }
-
-                // Logging
-
                 LoggerHelper.Log(
                     "Window validated");
             }

@@ -10,9 +10,6 @@ namespace DesktopAutomationFramework.Tests
     public class NotepadEditFeatureTests
         : BaseTest
     {
-        // TC_006
-        // Verify undo feature
-
         [Test]
         [TestCase(
             @"C:\Temp\TestFiles\Undo_FlaUI.txt",
@@ -24,7 +21,7 @@ namespace DesktopAutomationFramework.Tests
 
         [Category("P1")]
         [Order(1)]
-        [Description("TC_006 - Verify Undo Feature")]
+        [Description("TC_6: Verify Undo Feature")]
         public void VerifyUndoFeature(
             string filePath,
             string appendText)
