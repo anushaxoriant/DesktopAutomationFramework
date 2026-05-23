@@ -38,12 +38,12 @@ pipeline
         }
 
         stage('Generate Allure Report')
-        {
-            steps
-            {
-                bat 'allure generate .\bin\Debug\net8.0-windows\allure-results --clean -o allure-report'
-            }
-        }
+{
+    steps
+    {
+        bat 'allure generate ./bin/Debug/net8.0-windows/allure-results --clean -o allure-report'
+    }
+}
     }
 
     post
