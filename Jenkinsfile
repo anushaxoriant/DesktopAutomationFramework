@@ -28,6 +28,14 @@ pipeline
                 bat 'dotnet clean'
             }
         }
+		
+		stage('Clean Allure Results')
+{
+    steps
+    {
+        bat 'if exist bin\\Debug\\net8.0-windows\\allure-results rmdir /s /q bin\\Debug\\net8.0-windows\\allure-results'
+    }
+}
 
         // =========================
         // RESTORE
