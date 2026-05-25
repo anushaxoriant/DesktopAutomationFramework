@@ -1,23 +1,29 @@
-using System;
-using System.Threading;
-
 namespace DesktopAutomationFramework.Utilities
 {
     public static class RetryHelper
     {
+        // =========================
+        // RETRY ACTION
+        // =========================
+
         public static void RetryAction(
             Action action,
-            string failureMessage)
+            string failureMessage,
+            int retryCount = 3,
+            int delayMilliseconds = 1000)
         {
             Exception? lastException = null;
 
             for (int attempt = 1;
-                 attempt <= FrameworkConstants.RetryCount;
+                 attempt <= retryCount;
                  attempt++)
             {
                 try
                 {
                     action();
+
+                    LoggerHelper.Log(
+                        $"Retry action succeeded on attempt {attempt}");
 
                     return;
                 }
@@ -26,16 +32,31 @@ namespace DesktopAutomationFramework.Utilities
                     lastException = ex;
 
                     LoggerHelper.Log(
-                        $"Retry {attempt} failed: {ex.Message}");
+                        $"Retry attempt {attempt} failed. {ex.Message}");
 
-                    Thread.Sleep(
-                        FrameworkConstants.RetryDelay);
+                    Task.Delay(
+                        delayMilliseconds)
+                        .Wait();
                 }
             }
 
             throw new Exception(
-                failureMessage,
+                $"{failureMessage} Retry failed after {retryCount} attempts.",
                 lastException);
+        }
+
+        // =========================
+        // SIMPLE RETRY
+        // =========================
+
+        public static void Retry(
+            Action action,
+            int retryCount = 3)
+        {
+            RetryAction(
+                action,
+                "Retry operation failed.",
+                retryCount);
         }
     }
 }

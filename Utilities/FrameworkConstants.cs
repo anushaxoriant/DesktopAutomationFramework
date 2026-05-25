@@ -8,6 +8,9 @@ namespace DesktopAutomationFramework.Utilities
 
         public const int RetryDelay = 1000;
 
+        public const int DefaultDelay =
+            700;
+
         public const string ScreenshotFolder =
             @"C:\Temp\Screenshots";
 
@@ -18,3 +21,4 @@ namespace DesktopAutomationFramework.Utilities
             @"C:\Windows\System32\notepad.exe";
     }
 }
+

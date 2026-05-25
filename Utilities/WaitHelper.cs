@@ -1,19 +1,25 @@
-using System;
-using System.Threading;
+using FlaUI.Core.AutomationElements;
 
 namespace DesktopAutomationFramework.Utilities
 {
     public static class WaitHelper
     {
+        // =========================
+        // WAIT UNTIL
+        // =========================
+
         public static void WaitUntil(
             Func<bool> condition,
-            string timeoutMessage,
-            int timeout = FrameworkConstants.DefaultTimeout)
+            string failureMessage,
+            int timeoutSeconds = 10)
         {
-            var endTime =
-                DateTime.Now.AddMilliseconds(timeout);
+            DateTime startTime =
+                DateTime.Now;
 
-            while (DateTime.Now < endTime)
+            Exception? lastException = null;
+
+            while ((DateTime.Now - startTime)
+                .TotalSeconds < timeoutSeconds)
             {
                 try
                 {
@@ -22,15 +28,51 @@ namespace DesktopAutomationFramework.Utilities
                         return;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    lastException = ex;
                 }
 
-                Thread.Sleep(500);
+                Task.Delay(500)
+                    .Wait();
             }
 
-            throw new TimeoutException(
-                timeoutMessage);
+            throw new Exception(
+                $"{failureMessage}" +
+
+                $"{(lastException != null ? $" Last error: {lastException.Message}" : "")}");
+        }
+
+        // =========================
+        // WAIT FOR ELEMENT
+        // =========================
+
+        public static void WaitForElement(
+            AutomationElement? element,
+            int timeoutSeconds = 10)
+        {
+            WaitUntil(
+                () =>
+                    element != null
+                    &&
+                    element.IsEnabled,
+
+                "Element not available",
+
+                timeoutSeconds);
+        }
+
+        // =========================
+        // APPLY DELAY
+        // =========================
+
+        public static void ApplyDelay(
+            int milliseconds =
+                FrameworkConstants.DefaultDelay)
+        {
+            Task.Delay(
+                milliseconds)
+                .Wait();
         }
     }
 }

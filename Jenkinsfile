@@ -4,6 +4,10 @@ pipeline
 
     stages
     {
+        // =========================
+        // CHECKOUT
+        // =========================
+
         stage('Checkout')
         {
             steps
@@ -13,6 +17,22 @@ pipeline
             }
         }
 
+        // =========================
+        // CLEAN
+        // =========================
+
+        stage('Clean')
+        {
+            steps
+            {
+                bat 'dotnet clean'
+            }
+        }
+
+        // =========================
+        // RESTORE
+        // =========================
+
         stage('Restore')
         {
             steps
@@ -20,6 +40,10 @@ pipeline
                 bat 'dotnet restore'
             }
         }
+
+        // =========================
+        // BUILD
+        // =========================
 
         stage('Build')
         {
@@ -29,22 +53,46 @@ pipeline
             }
         }
 
-        stage('Execute Tests')
-{
-    steps
-    {
-            bat 'dotnet test --logger trx'
-    }
-}
+        // =========================
+        // POSITIVE TESTS
+        // =========================
+
+        stage('Execute Positive Tests')
+        {
+            steps
+            {
+                bat 'dotnet test --filter "Category!=P3" --logger trx'
+            }
+        }
+
+        // =========================
+        // NEGATIVE TESTS
+        // =========================
+
+        stage('Execute Negative Tests')
+        {
+            steps
+            {
+                bat 'dotnet test --filter "Category=P3" --logger trx'
+            }
+        }
+
+        // =========================
+        // GENERATE ALLURE REPORT
+        // =========================
 
         stage('Generate Allure Report')
-{
-    steps
-    {
-        bat 'allure generate ./bin/Debug/net8.0-windows/allure-results --clean -o allure-report'
+        {
+            steps
+            {
+                bat 'allure generate ./bin/Debug/net8.0-windows/allure-results --clean -o allure-report'
+            }
+        }
     }
-}
-    }
+
+    // =========================
+    // POST ACTIONS
+    // =========================
 
     post
     {
@@ -54,7 +102,7 @@ pipeline
                 includeProperties: false,
                 jdk: '',
                 results: [[path:'bin/Debug/net8.0-windows/allure-results']],
-				commandline: 'Allure'
+                commandline: 'Allure'
             )
         }
     }

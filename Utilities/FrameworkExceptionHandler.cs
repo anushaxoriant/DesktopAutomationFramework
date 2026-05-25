@@ -15,15 +15,6 @@ namespace DesktopAutomationFramework.Utilities
             LoggerHelper.Log(
                 $"EXCEPTION: {ex.Message}");
 
-            string screenshotPath =
-                ScreenshotHelper.CaptureScreenshot(
-                    TestContext.CurrentContext.Test.Name);
-
-            AllureApi.AddAttachment(
-                "Failure Screenshot",
-                "image/png",
-                screenshotPath);
-
             throw new Exception(
                 message,
                 ex);

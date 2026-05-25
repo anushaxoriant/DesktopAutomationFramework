@@ -1,107 +1,155 @@
-using System.IO;
+using System;
 
 namespace DesktopAutomationFramework.Utilities
 {
     public static class FileHelper
     {
-        private static readonly string TestFolder =
-            @"C:\Temp\TestFiles";
+        // =========================
+        // PREPARE TEST FILES
+        // =========================
+
         public static void PrepareTestFiles()
         {
             try
             {
-                Directory.CreateDirectory(
-                    TestFolder);
+                LoggerHelper.Log(
+                    "Preparing test files");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "AppendText_FlaUI.txt"),
+                string testFilesFolder =
+                    @"C:\Temp\TestFiles";
+
+
+                 string negativeFolder = @"C:\Temp\TestFiles\Negative";
+
+                 if (Directory.Exists(
+            testFilesFolder))
+        {
+            LoggerHelper.Log(
+                "Deleting existing TestFiles directory");
+
+            Directory.Delete(
+                testFilesFolder,
+                true);
+
+            WaitHelper.ApplyDelay(
+                1000);
+        }
+                    Directory.CreateDirectory(
+                        testFilesFolder);
+
+                    LoggerHelper.Log(
+                        $"Created folder: {testFilesFolder}");
+
+                    Directory.CreateDirectory(
+    negativeFolder);
+
+LoggerHelper.Log(
+    "Negative folder created");
+
+                // =========================
+                // CREATE BASELINE FILES
+                // =========================
+
+                CreateFile(
+                    @"C:\Temp\TestFiles\AppendText_FlaUI.txt",
                     "Hello World");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "AppendText_Automation.txt"),
+                CreateFile(
+                    @"C:\Temp\TestFiles\ClearText.txt",
                     "Hello World");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "ClearText.txt"),
-                    "Hello World");
-
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Find_Hello.txt"),
+                CreateFile(
+                    @"C:\Temp\TestFiles\Find_World.txt",
                     "Hello World FlaUI");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Find_World.txt"),
-                    "Hello World FlaUI");
-
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Find_FlaUI.txt"),
-                    "Hello World FlaUI");
-
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Replace_World.txt"),
+                CreateFile(
+                    @"C:\Temp\TestFiles\Replace_World.txt",
                     "Hello World");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Replace_Hello.txt"),
+                CreateFile(
+                    @"C:\Temp\TestFiles\Undo_FlaUI.txt",
                     "Hello World");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Undo_FlaUI.txt"),
-                    "Hello World");
+                CreateFile(
+    @"C:\Temp\TestFiles\Negative\AppendText_Empty.txt",
+    "Hello World");
 
-                File.WriteAllText(
-                    Path.Combine(
-                        TestFolder,
-                        "Undo_Framework.txt"),
-                    "Hello World");
+    CreateFile(
+    @"C:\Temp\TestFiles\Negative\ClearText_Empty.txt",
+    "Hello World");
+
+    CreateFile(
+    @"C:\Temp\TestFiles\Negative\FindText_Invalid.txt",
+    "Hello World");
+
+    CreateFile(
+    @"C:\Temp\TestFiles\Negative\ReplaceText_Invalid.txt",
+    "Hello World");
+
+    CreateFile(
+    @"C:\Temp\TestFiles\Negative\UndoText_Empty.txt",
+    "Hello World");
 
                 LoggerHelper.Log(
-                    "Baseline test files prepared");
+                    "Test files prepared successfully");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    $"PrepareTestFiles failed. {ex.Message}");
+            }
+        }
+
+        // =========================
+        // CREATE FILE
+        // =========================
+
+        private static void CreateFile(
+            string filePath,
+            string content)
+        {
+            try
+            {
+                File.WriteAllText(
+                    filePath,
+                    content);
+
+                LoggerHelper.Log(
+                    $"Created file: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    $"CreateFile failed for '{filePath}'. {ex.Message}");
+            }
+        }
+
+        // =========================
+        // CLEANUP TEST FILES
+        // =========================
+
+        public static void CleanupTestFiles()
+        {
+            try
+            {
+                string testFilesFolder =
+                    @"C:\Temp\TestFiles";
+
+                if (Directory.Exists(
+                    testFilesFolder))
+                {
+                    Directory.Delete(
+                        testFilesFolder,
+                        true);
+
+                    LoggerHelper.Log(
+                        $"Deleted folder: {testFilesFolder}");
+                }
             }
             catch (Exception ex)
             {
                 LoggerHelper.Log(
-                    $"PrepareTestFiles failed: {ex.Message}");
-
-                throw;
-            }
-        }
-        public static void CleanupTestFiles()
-        {
-            if (Directory.Exists(
-                TestFolder))
-            {
-                Directory.Delete(
-                    TestFolder,
-                    true);
-            }
-
-            string saveFile =
-                @"C:\Temp\SaveFile.txt";
-
-            if (File.Exists(
-                saveFile))
-            {
-                File.Delete(
-                    saveFile);
+                    $"CleanupTestFiles failed: {ex.Message}");
             }
         }
     }
