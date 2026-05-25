@@ -69,7 +69,7 @@ pipeline
         {
             steps
             {
-                bat 'dotnet test --filter "Category!=P3" --logger trx'
+                bat 'dotnet test --filter "Category!=P3" --logger "console;verbosity=detailed"'
             }
         }
 
@@ -81,7 +81,7 @@ pipeline
         {
             steps
             {
-                bat 'dotnet test --filter "Category=P3" --logger trx'
+                bat 'dotnet test --filter "Category=P3" --logger "console;verbosity=detailed"'
             }
         }
 
